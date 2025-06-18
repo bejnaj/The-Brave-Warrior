@@ -1,4 +1,4 @@
-ID,nombre,tipo{vida|daño|defensa|saltarTurno},coste(para saltarTurno),operacion{suma|mult},cantidad
+ID,nombre,tipoStatus{vida|daño|defensa|saltarTurno},coste(para saltarTurno),operacion{suma|mult},cantidad
 1,Envenenado,vida,,suma,-10
 2,Regeneración,vida,,suma,10
 3,Herida Grave,vida,,suma,-25
@@ -23,8 +23,8 @@ ID,nombre,tipo{vida|daño|defensa|saltarTurno},coste(para saltarTurno),operacion
 22,Envenenamiento Grave,vida,,suma,-25
 23,Recuperación Rápida,vida,,suma,20
 24,Confundido,saltarTurno,1,,1
-25,Somnoliento,saltarTurno,1,,1
-26,Inmune,saltarTurno,0,,0
+25,Dormido,saltarTurno,3,,1
+26,Impenetrable,defensa,,mult,3
 27,Escudo de Energía,defensa,,suma,50
 28,Maldito,vida,,suma,-20
 29,Bendecido,vida,,suma,20

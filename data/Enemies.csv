@@ -9,10 +9,10 @@ Rey Orco,350;45;30,NULL,True,Enfurecer;Aturdir;Blindaje
 Esqueleto,60;12;6,NULL,False,Desangrar
 Esqueleto Arquero,55;18;4,NULL,False,Debilitar
 Esqueleto Mago,50;10;3,NULL,False,Envenenar
-Capitán Esqueleto,150;28;15,NULL,True,Desangrar;Debilitar;Romper Defensa
+Skeletron,150;28;15,NULL,True,Desangrar;Debilitar;Romper Defensa
 Slime,40;8;2,NULL,False,Envenenar
 Slime Venenoso,60;12;4,NULL,False,Envenenar
-Slime Gigante,200;25;10,NULL,True,Envenenar;Regeneración;Blindaje
+Rey Slime,200;25;10,NULL,True,Envenenar;Regeneración;Blindaje
 Bandido,80;20;8,NULL,False,Herida Grave
 Bandido Líder,140;30;12,NULL,True,Herida Grave;Aturdir;Curación Menor
 Murciélago,30;7;2,NULL,False,Desangrar
@@ -20,5 +20,5 @@ Murciélago Vampiro,80;18;6,NULL,False,Curación Menor
 Gran Vampiro,220;35;18,NULL,True,Curación Mayor;Desangrar;Aturdir
 Lobo,70;16;7,NULL,False,Desangrar
 Lobo Alfa,150;28;14,NULL,True,Desangrar;Enfurecer;Blindaje
-Mago Oscuro,90;22;8,NULL,False,Maldecir
-Archimago Oscuro,200;35;15,NULL,True,Maldecir;Quemar;Confundir
+wizard,90;22;8,NULL,False,Maldecir
+Super Wizard,200;35;15,NULL,True,Maldecir;Quemar;Confundir

@@ -1,4 +1,4 @@
-nombre,esConsumible{noConsumible|libroDeHabilidad|tipoPocion},esEquipable{noEquipable|arma|armadura},{vida;daño;defensa},vidaRecuperada,habilidadAprendida,descripción
+nombre,tipoConsumible{noConsumible|libroDeHabilidad|tipoPocion},tipoEquipable{noEquipable|arma|armadura},{vida;daño;defensa},vidaRecuperada,habilidadAprendida,descripción
 Pocion Curativa,tipoPocion,noEquipable,0;0;0,50,NULL,"Te curas 50 puntos de vida, ADVERTENCIA: alto en azucares"
 Pocion Super-Curativa,tipoPocion,noEquipable,0;0;0,200,NULL,"Te curas 200 puntos de vida, como si no hubiera pasado nada"
 Carne Asada,tipoPocion,noEquipable,0;0;0,10,NULL,"Te curas 10 puntos de vida, debe haber un asaito cerca"

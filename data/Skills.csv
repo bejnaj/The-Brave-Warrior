@@ -1,27 +1,27 @@
-nombre,cooldown,duracion,tipo{Curacion|Estado},vidaCurada,estados(ID),hacia{Propio|Enemigo}
-Curación Menor,2,0,Curacion,20,,Propio
-Curación Mayor,4,0,Curacion,50,,Propio
-Regeneración,3,3,Estado,0,2,Propio
-Envenenar,3,3,Estado,0,1,Enemigo
-Quemar,3,2,Estado,0,15,Enemigo
-Herida Grave,4,2,Estado,0,3,Enemigo
-Bendición,5,2,Estado,0,29,Propio
-Maldecir,5,2,Estado,0,28,Enemigo
-Blindaje,4,2,Estado,0,18,Propio
-Escudo de Energía,6,2,Estado,0,27,Propio
-Aturdir,4,1,Estado,0,12,Enemigo
-Paralizar,6,2,Estado,0,13,Enemigo
-Congelar,5,1,Estado,0,14,Enemigo
-Inspirar,3,2,Estado,0,16,Propio
-Desmoralizar,3,2,Estado,0,17,Enemigo
-Fuerza Potenciada,5,2,Estado,0,6,Propio
-Debilitar,5,2,Estado,0,7,Enemigo
-Defensa de Hierro,5,2,Estado,0,8,Propio
-Romper Defensa,5,2,Estado,0,9,Enemigo
-Recuperación Rápida,4,2,Estado,0,23,Propio
-Desangrar,4,2,Estado,0,20,Enemigo
-Confundir,4,1,Estado,0,24,Enemigo
-Somnolencia,4,1,Estado,0,25,Enemigo
-Enfurecer,6,2,Estado,0,19,Propio
-Protección Divina,8,2,Estado,0,21,Propio
-Dureza de Piel,5,2,Estado,0,8,Propio
+nombre,cooldown,duracion,tipoSkill{curacion|estado},vidaCurada,estados(ID),hacia{1(Propio)|0(Enemigo)}
+Curación Menor,2,0,curacion,20,,1
+Curación Mayor,4,0,curacion,50,,1
+Regeneración,3,3,estado,0,2,1
+Envenenar,3,3,estado,0,1,0
+Quemar,3,2,estado,0,15,0
+Herida Grave,4,2,estado,0,3,0
+Bendición,5,2,estado,0,29,1
+Maldecir,5,2,estado,0,28,0
+Blindaje,4,2,estado,0,18,1
+Escudo de Energía,6,2,estado,0,27,1
+Aturdir,4,1,estado,0,12,0
+Paralizar,6,2,estado,0,13,0
+Congelar,5,1,estado,0,14,0
+Inspirar,3,2,estado,0,16,1
+Desmoralizar,3,2,estado,0,17,0
+Fuerza Potenciada,5,2,estado,0,6,1
+Debilitar,5,2,estado,0,7,0
+Defensa de Hierro,5,2,estado,0,8,1
+Romper Defensa,5,2,estado,0,9,0
+Recuperación Rápida,4,2,estado,0,23,1
+Desangrar,4,2,estado,0,20,0
+Confundir,4,1,estado,0,24,0
+Somnolencia,4,1,estado,0,25,0
+Enfurecer,6,2,estado,0,19,1
+Protección Divina,8,2,estado,0,21,1
+Dureza de Piel,5,2,estado,0,8,1
