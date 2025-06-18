@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <stdbool.h>
+#include <tdas/list.h>
+#include <tdas/extra.h>
 
 typedef enum {
     noEquipable,
@@ -82,6 +84,6 @@ typedef struct {
     int costeTurnos;
 } Status;
 
-int main {
+int main() {
     return 1;
 }
