@@ -1,0 +1,22 @@
+nombre,esConsumible{noConsumible|libroDeHabilidad|tipoPocion},esEquipable{noEquipable|arma|armadura},{vida;daño;defensa},vidaRecuperada,habilidadAprendida,descripción
+Pocion Curativa,tipoPocion,noEquipable,0;0;0,50,NULL,"Te curas 50 puntos de vida, ADVERTENCIA: alto en azucares"
+Pocion Super-Curativa,tipoPocion,noEquipable,0;0;0,200,NULL,"Te curas 200 puntos de vida, como si no hubiera pasado nada"
+Carne Asada,tipoPocion,noEquipable,0;0;0,10,NULL,"Te curas 10 puntos de vida, debe haber un asaito cerca"
+Pollo Asado,tipoPocion,noEquipable,0;0;0,10,NULL,"Te curas 10 puntos de vida, cómo es que sigue caliente"
+Pan con Fiambre,tipoPocion,noEquipable,0;0;0,10,NULL,"Te curas 10 puntos de vida, no hay suficientes descripciones chistosas"
+Completo,tipoPocion,noEquipable,0;0;0,250,NULL,"Te curas 250 puntos de vida, lo mejor de la vida"
+Pescado al Horno,tipoPocion,noEquipable,0;0;0,20,NULL,"Te curas 20 puntos de vida, ahora como nunca hay hornos y asados en la mazmorra"
+Completo con Chucrut,tipoPocion,noEquipable,0;0;0,200,NULL,"Te curas 200 puntos de vida, esta infravalorado"
+Completo Vegano,tipoPocion,noEquipable,0;0;0,200,NULL,"Te curas 200 puntos de vida, pasamos de sobrevivir a una mazmorra a comidas del siglo 21"
+Cerdo con Salsa Blanca,tipoPocion,noEquipable,0;0;0,20,NULL,"Te curas 20 puntos de vida, marca Super Chancho"
+Pollo con Salsa Blanca,tipoPocion,noEquipable,0;0;0,20,NULL,"Te curas 20 puntos de vida, tantas comidas ricas me van a dar hambre de verdad"
+Pollo al Jugo,tipoPocion,noEquipable,0;0;0,20,NULL,"Te curas 20 puntos de vida, los pollos abundan en la mazmorra"
+Hongo Venenoso,tipoPocion,noEquipable,0;0;0,-5,NULL,"Pierdes 5 puntos de vida, por qué existe esto"
+Hongo Curativo,tipoPocion,noEquipable,0;0;0,5,NULL,"Te curas 5 puntos de vida, bastante inutil"
+Hongo,tipoPocion,noEquipable,0;0;0,0,NULL,"Hazlo por honga"
+Hongo Filoso,tipoPocion,arma,0;10;0,-10,NULL,"Tiene 10 puntos de daño, si lo consumes pierdes 10 puntos de vida (POR QUÉ TE COMERÍAS ALGO FILOSO)"
+Estaca de Madera,noConsumible,arma,0;50;0,0,NULL,"Tiene 15 puntos de daño, perfecto para matar vampiros"
+Poro de Bolsillo,noConsumible,
+Libro de los Gigantes,libroDeHabilidad,noEquipable,0;0;0,0,Dureza_de_Piel,"Habilidad de x2 de defensa actual por 2 turnos, balls of steel"
+Libro de Vampirismo,libroDeHabilidad,noEquipable,0;0;0,0,Curacion_Vampiresca,"Habilidad curativa de +20 de curación, a los vampiros ya no les gusta morder a la gente"
+Libro de los

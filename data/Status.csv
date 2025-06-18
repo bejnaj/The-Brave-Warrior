@@ -1,9 +1,0 @@
-ID,nombre,tipo{vida|daño|defensa|saltarTurno},coste,operación{suma|multiplicacion},cantidad
-1,Quemadura,vida,0,suma,-10,
-2,Congelación,saltarTurno,1,suma,-5
-3,Hemorragia,vida,0,suma,-20
-4,Veneno,vida,0,suma,-10
-5,Debilidad,defensa,0,multiplicacion,0.8
-6,Pequeño,defensa,0,multiplicacion,0.5
-7,Resistencia,defensa,0,multiplicacion,1.2
-8,Gigante,defensa,0,multiplicacion,2
