@@ -16,7 +16,12 @@ Hongo Curativo,tipoPocion,noEquipable,0;0;0,5,NULL,"Te curas 5 puntos de vida, b
 Hongo,tipoPocion,noEquipable,0;0;0,0,NULL,"Hazlo por honga"
 Hongo Filoso,tipoPocion,arma,0;10;0,-10,NULL,"Tiene 10 puntos de daño, si lo consumes pierdes 10 puntos de vida (POR QUÉ TE COMERÍAS ALGO FILOSO)"
 Estaca de Madera,noConsumible,arma,0;50;0,0,NULL,"Tiene 15 puntos de daño, perfecto para matar vampiros"
-Poro de Bolsillo,noConsumible,
-Libro de los Gigantes,libroDeHabilidad,noEquipable,0;0;0,0,Dureza_de_Piel,"Habilidad de x2 de defensa actual por 2 turnos, balls of steel"
-Libro de Vampirismo,libroDeHabilidad,noEquipable,0;0;0,0,Curacion_Vampiresca,"Habilidad curativa de +20 de curación, a los vampiros ya no les gusta morder a la gente"
-Libro de los
+Libro de los Gigantes,libroDeHabilidad,noEquipable,0;0;0,0,Dureza de Piel,"Habilidad de x2 de defensa actual por 2 turnos, te sientes inmortal"
+Libro de la Regeneración,libroDeHabilidad,noEquipable,0;0;0,0,Regeneración,"Aprende a regenerar vida durante 3 turnos"
+Libro de la Bendición,libroDeHabilidad,noEquipable,0;0;0,0,Bendición,"Recibe una bendición que aumenta tu vida"
+Libro del Enfurecimiento,libroDeHabilidad,noEquipable,0;0;0,0,Enfurecer,"Duplica tu daño durante 2 turnos"
+Libro de la Protección Divina,libroDeHabilidad,noEquipable,0;0;0,0,Protección Divina,"Triplica tu defensa durante 2 turnos"
+Libro de la Recuperación,libroDeHabilidad,noEquipable,0;0;0,0,Recuperación Rápida,"Recupera vida rápidamente durante 2 turnos"
+Libro de la Inspiración,libroDeHabilidad,noEquipable,0;0;0,0,Inspirar,"Aumenta tu daño durante 2 turnos"
+Libro del Escudo de Energía,libroDeHabilidad,noEquipable,0;0;0,0,Escudo de Energía,"Obtén un escudo temporal de defensa"
+Libro de la Curación Mayor,libroDeHabilidad,noEquipable,0;0;0,0,Curación Mayor,"Cura una gran cantidad de vida"

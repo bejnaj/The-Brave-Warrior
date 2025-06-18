@@ -1,0 +1,31 @@
+ID,nombre,tipo{vida|daño|defensa|saltarTurno},coste(para saltarTurno),operacion{suma|mult},cantidad
+1,Envenenado,vida,,suma,-10
+2,Regeneración,vida,,suma,10
+3,Herida Grave,vida,,suma,-25
+4,Curación Menor,vida,,suma,15
+5,Curación Mayor,vida,,suma,50
+6,Fuerza Potenciada,daño,,mult,1.5
+7,Debilitado,daño,,mult,0.7
+8,Defensa de Hierro,defensa,,mult,2
+9,Defensa Rota,defensa,,mult,0.5
+10,Escudo Temporal,defensa,,suma,20
+11,Desprotegido,defensa,,suma,-15
+12,Aturdido,saltarTurno,1,,1
+13,Paralizado,saltarTurno,2,,1
+14,Congelado,saltarTurno,1,,1
+15,Quemadura,vida,,suma,-5
+16,Inspirado,daño,,suma,10
+17,Desmoralizado,daño,,suma,-10
+18,Blindaje,defensa,,suma,30
+19,Enfurecido,daño,,mult,2
+20,Desangrado,vida,,suma,-15
+21,Protección Divina,defensa,,mult,3
+22,Envenenamiento Grave,vida,,suma,-25
+23,Recuperación Rápida,vida,,suma,20
+24,Confundido,saltarTurno,1,,1
+25,Somnoliento,saltarTurno,1,,1
+26,Inmune,saltarTurno,0,,0
+27,Escudo de Energía,defensa,,suma,50
+28,Maldito,vida,,suma,-20
+29,Bendecido,vida,,suma,20
+30,Desesperado,daño,,mult,1.2
