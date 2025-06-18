@@ -1,0 +1,11 @@
+nombre,cooldown,duracion,tipo{Curacion|Estado},vidaCurada,estados,haciaUnoMismo{true|false}
+Golpe_Severo,2,1,Curacion,-30,0,false
+Visión_Laser,4,2,Estado,0,1,false
+Mordida_Venenosa,4,2,Estado,0,4,false
+Curacion_Vampiresca,4,2,Curacion,20,0,false
+Dureza_de_Piel,4,2,Estado,0,8,false
+Saborizacion_Agridulce,3,1,Curacion,40,0,true
+Canalización_de_Hielo,2
+Puchas,4,1,Curacion,-75,0
+Recorcholis,
+Recrestas

@@ -1,0 +1,14 @@
+Nombre,{vida;ataque;defensa},loot,esJefe(bool),habilidades
+Pollo,20;5;0,NULL,false,NULL
+Enjambre de Moscas,50;15;0,NULL,false,Mordida_Venenosa
+Jinete Avícola,50;30;10,NULL,false,NULL
+Ratón sin cola,20;10;0,NULL,false,NULL
+Ratón con cola,25;10;0,NULL,false,NULL
+Poro,30;5;0,NULL,false,NULL
+Vampiro,150;20;0,NULL,false,Curacion_Vampiresca
+Orco Enojado,200;20;5,NULL,false,Golpe_Severo
+Orco,200;15;2,NULL,false,Golpe_Severo
+Gigante,500;10;2,NULL,false,Dureza_de_Piel
+Completo con piernas,15;50;0,NULL,false,Saborizacion_Agridulce
+Elfo de Hielo, , , ,Congelacion 
+Piñera Robot 3000,1000;30;10,NULL,true,Puchas;Recorcholis;Recrestas
