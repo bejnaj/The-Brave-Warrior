@@ -8,8 +8,10 @@
 
 Escenario **crearMatriz(Map *mapaItems, Map *mapaEnemigos, Jugador *P, Map *mapaJefes) {
     Escenario **matriz = malloc(sizeof(Escenario *) * 5); // Se almacena memoria para cada Escenario *
+
     for (int i = 0 ; i < 5 ; i++) { // Se recorren todos los elementos del Escenario *
         matriz[i] = malloc(sizeof(Escenario) * 5); // Se almacena memoria para cada Escenario **
+
         for (int j = 0 ; j < 5 ; j++) {
             matriz[i][j].tipo = rand() % 3; // Tipo random entre 0-2
             switch (matriz[i][j].tipo) { // Depende del tipo seleccionado
@@ -28,19 +30,149 @@ Escenario **crearMatriz(Map *mapaItems, Map *mapaEnemigos, Jugador *P, Map *mapa
                     matriz[i][j].enemigo = NULL;
                     break;
             }
+
             // Se colocan posicion y visitado en defecto
             matriz[i][j].coords.posX = i;
             matriz[i][j].coords.posY = j;
             matriz[i][j].visitado = false;
         }
     }
-    // Una vez terminados todos los escenarios, elegir el jefe
+
+    // Una vez terminados todos los escenarios, elegir el jefe aleatoriamente
     int aux = rand() % 25; // Obtener numero random entre 0-24
-    int indX = aux / 5;
-    int indY = aux % 5;
+    int indX = aux / 5; // Posicion en X
+    int indY = aux % 5; // Posicion en Y
+    int jefeX = indX;
+    int jefeY = indY;
+
+    // Cambiar datos para que ahora esta casilla sea de jefe
     matriz[indX][indY].tipo = JEFE;
-    matriz[indX][indY].enemigo = clonarJefe(mapaJefes, P);
+    if (matriz[indX][indY].enemigo != NULL) { // Limpiar datos del enemigo previo si existia
+         free(matriz[indX][indY].enemigo); 
+    }
+    matriz[indX][indY].enemigo = clonarJefe(mapaJefes, P); 
     matriz[indX][indY].objeto = NULL;
+
+    // Actualizar los datos del jugador (spawn aleatorio)
+    while (jefeX != indX && jefeY != indY) { // Asegurar que no aparezca en la sala del jefe
+        aux = rand() % 25; // Obtener numero random entre 0-24
+        indX = aux / 5; // Posicion en X
+        indY = aux % 5; // Posicion en Y
+    }
+    P -> posicion.posX = indX;
+    P -> posicion.posY = indY;
+    return matriz;
+}
+
+void verificarOpcion(int *num, int limite) {
+    char str[3];
+    while (1) {
+        fgets(str, 3, stdin);
+        if (str[strlen(str) - 1] != '\n') { //Se revisa si el usuario escribio mas de 2 caracteres
+            int ch;
+            while ((ch = getchar()) != '\n' && ch != EOF); // Limpiar stdin para leer correctamente el proximo input
+        } 
+        else {
+            if (isdigit(str[0]) && str[1] == '\n') { //En caso de que el numero ingresado no sea valido
+                *num = str[0] - '0';
+                if (*num > 0 && *num <= limite) break;
+            }
+        }
+        puts("Ingresa una opcion Valida");
+    }
+}
+
+void movimientoMazmorra(Jugador *P, Escenario **S) {
+    int num;
+    bool flag = true; // Para controlar el loop hasta que se ingrese una opcion valida
+    while (flag) {
+        puts("Ingresa una direccion:");
+        puts("1) Arriba / 2) Abajo / 3) Izquierda / 4) Derecha");
+        verificarOpcion(&num, 4); // Obtiene y formatea la opcion elegida
+        int tempX = P -> posicion.posX;
+        int tempY = P -> posicion.posY;
+        switch (num) {
+            case 1:
+                if (tempY > 0) { // Si es posible hacer el movimiento
+                    P -> posicion.posY -= 1;
+                    flag = false;
+                }
+                else
+                    puts("No es posible realizar ese movimiento.");
+                break;
+
+            case 2:
+                if (tempY < 4) { // Si es posible hacer el movimiento
+                    P -> posicion.posY += 1;
+                    flag = false;
+                }
+                else
+                    puts("No es posible realizar ese movimiento.");
+                break;
+
+            case 3:
+                if (tempX > 0) { // Si es posible hacer el movimiento
+                    P -> posicion.posX -= 1;
+                    flag = false;
+                }
+                else
+                    puts("No es posible realizar ese movimiento.");
+                break;
+
+            case 4:
+                if (tempX < 4) { // Si es posible hacer el movimiento
+                    P -> posicion.posX += 1;
+                    flag = false;
+                }
+                else
+                    puts("No es posible realizar ese movimiento.");
+                break;
+        }
+    }
+}
+
+void procesarTurno(Jugador *P, Escenario **S) {
+    //returns:
+    //0: muerte
+    //1: avanzar piso
+    //2: no hacer nada
+
+    Escenario *aux = &S[P -> posicion.posX][P -> posicion.posY]; // Mucho texto
+    if (aux -> visitado == false) { // Revisa si la casilla fue visitada
+        aux -> visitado = true; // La marca como visitada
+        switch (aux -> tipo) { // Revisa el tipo del escenario
+            case VACIO:
+                puts("Mala suerte, esta sala esta vacia.");
+                break;
+
+            case ENEMIGO:
+                if(interfazDeCombate(P, aux -> enemigo)) // Suponiendo que retorna 1 si fue victoria y 0 si fue derrota
+                    break;
+                else
+                    return 0;
+
+            case ITEM:
+                interfazDeItem(P, aux -> objeto);
+                break;
+
+            case JEFE:
+                int num;
+                printf("Te encierra un aura maligna... El jefe %s te está esperando\n", aux -> enemigo -> nombre);
+                printf("(Vida: %d, Daño: %d, Defensa: %d). ¿Estás listo para pelear?\n", aux -> enemigo -> vida, aux -> enemigo -> ataque, aux -> enemigo -> defensa);
+                puts("1) Si / 2) No");
+                verificarOpcion(&num, 2);
+                if (num == 1)
+                    comenzarPelea(P, aux -> enemigo);
+                else {
+                    puts("Decidiste no enfrentarte al jefe... pero la mazmorra castiga la cobardía alterando su estructura.");
+                    limpiarPiso(S);
+                    return 1;
+                }
+                break;
+        }
+    } else
+        puts("Este escenario ya fue visitado previamente.");
+    return 2;
 }
 
 int main() {
