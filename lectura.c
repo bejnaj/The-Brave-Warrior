@@ -23,9 +23,7 @@ void leer_status(List *listaStatus) {
         continue;
     }
     // Asigna memoria para el ID del Status
-    int *idEscenario = malloc(sizeof(int));
     Actual->id = atoi(campos[0]);
-    // Que tipo de efecto posee
     char *efectoDeStatus = strdup(campos[1]);
     if (strcmp(efectoDeStatus, "Vida"))
         Actual->tipo = 0;
@@ -61,23 +59,21 @@ void leer_skills(List *listaSkills) {
 
   // lee la linea correspondiente a una sala
   while ((campos = leer_linea_csv(archivo, ',')) != NULL) {
-    // guarda espacio para los datos del Status actual
     Skill *Actual = malloc(sizeof(Skill));
     if (Actual == NULL) {
         perror("Error al asignar memoria para la habilidad");
         continue;
     }
     // Asigna memoria para el nombre de la habilidad
-    Actual->nombre = atoi(campos[0]);
+    Actual->nombre = strdup(campos[0]);
     // Duracion de Cooldown para la habilidad
-    Actual->duracion = strdup(campos[1]);
+    Actual->cooldown = atoi(campos[1]);
     // Duracion de la habilidad
-    Actual->duracion = strdup(campos[2]);
-    tipoSkill tipoHabilidad = strdup(campos[3]);
-    if (strcmp(tipoHabilidad, "curacion") == 0) Actual->tipo = 0;
-    else if (strcmp(tipoHabilidad, "estado") == 0) Actual->tipo = 1;
+    Actual->duracion = atoi(campos[2]);
+    if (strcmp(campos[3], "curacion") == 0) Actual->tipo = curacion;
+    else if (strcmp(campos[3], "estado") == 0) Actual->tipo = estado;
     Actual->vidaCurada = atoi(campos[4]);
-    Actual->estado = atoi(campos[5]);
+    Actual->estado = NULL; // Puedes implementar la carga de estados si tienes la estructura
     Actual->hacia = atoi(campos[6]);
     // Agrega la habilidad a la lista
     list_pushFront(listaSkills, Actual);
@@ -99,55 +95,77 @@ void leer_items(List *listaItems) {
 
   // lee la linea correspondiente a una sala
   while ((campos = leer_linea_csv(archivo, ',')) != NULL) {
-    // guarda espacio para los datos del Status actual
     Item *Actual = malloc(sizeof(Item));
     if (Actual == NULL) {
         perror("Error al asignar memoria para la habilidad");
         continue;
     }
-    // Asigna memoria para el nombre de la habilidad
-    Actual->nombre = atoi(campos[0]);
+    // Asigna memoria para el nombre del item
+    Actual->nombre = strdup(campos[0]);
     // Como se usara el item
-    tipoConsumible tipoConsumibleItem = strdup(campos[1]);
-    if (strcmp(tipoConsumibleItem, "consumible") == 0) Actual->tipoCons = 0;
-    else if (strcmp(tipoConsumibleItem, "libroHabilidad") == 0) Actual->tipoCons = 1;
-    else if (strcmp(tipoConsumibleItem, "pocion") == 0) Actual->tipoCons = 2;
+    if (strcmp(campos[1], "noConsumible") == 0) Actual->tipoCons = noConsumible;
+    else if (strcmp(campos[1], "libroDeHabilidad") == 0) Actual->tipoCons = libroDeHabilidad;
+    else if (strcmp(campos[1], "tipoPocion") == 0) Actual->tipoCons = tipoPocion;
     // Donde se equipara el item
-    tipoEquipable tipoEquipableItem = strdup(campos[2]);
-    if (strcmp(tipoEquipableItem, "noEquipable") == 0) Actual->tipoEquip = 0;
-    else if (strcmp(tipoEquipableItem, "arma") == 0) Actual->tipoEquip = 1;
-    else if (strcmp(tipoEquipableItem, "armadura") == 0) Actual->tipoEquip = 2;
-    // Asigna los bonus del item
-    Bonus *statBonus = malloc(sizeof(Bonus));
-    if (statBonus == NULL) {
-        perror("Error al asignar memoria para los bonus del item");
-        continue;
-    }
-    statBonus->vidaBonus = atoi(campos[3]);
-    statBonus->AtaqueBonus = atoi(campos[4]);
-    statBonus->DefensaBonus = atoi(campos[5]);
-    Actual->statBonus = *statBonus;
+    if (strcmp(campos[2], "noEquipable") == 0) Actual->tipoEquip = noEquipable;
+    else if (strcmp(campos[2], "arma") == 0) Actual->tipoEquip = arma;
+    else if (strcmp(campos[2], "armadura") == 0) Actual->tipoEquip = armadura;
+    // Asigna los bonus del item (separado por ';')
+    int vida = 0, ataque = 0, defensa = 0;
+    sscanf(campos[3], "%d;%d;%d", &vida, &ataque, &defensa);
+    Actual->statBonus.vidaBonus = vida;
+    Actual->statBonus.AtaqueBonus = ataque;
+    Actual->statBonus.DefensaBonus = defensa;
     // Asigna la vida recuperada por el item
-    Actual->vidaRecuperada = atoi(campos[6]);
+    Actual->vidaRecuperada = atoi(campos[4]);
     // Asigna la descripcion del item
-    char *comillaInicio = strchr(campos[7], '"');
+    char *comillaInicio = strchr(campos[6], '"');
     char *comillaFin = NULL;
-    // Lee el final de la comilla
     if (comillaInicio) {
         comillaInicio++;
         comillaFin = strchr(comillaInicio, '"');
     }
-    // saca el tamaño de la descripcion y asigna memoria para esta, guardandola
     if (comillaInicio && comillaFin) {
         size_t len = comillaFin - comillaInicio;
         Actual->descripcion = malloc(len + 1);
         strncpy(Actual->descripcion, comillaInicio, len);
         Actual->descripcion[len] = '\0';
+    } else {
+        Actual->descripcion = strdup(campos[6]);
     }
     // Agrega el item a la lista
     list_pushFront(listaItems, Actual);
-    
   }
   fclose(archivo); 
 }
 
+void leer_Enemies(List *listaEnemigos) {
+  FILE *archivo = fopen("data/Enemies.csv", "r");
+  if (archivo == NULL) {
+    perror(
+        "Error al abrir el archivo");
+    return;
+  }
+
+  // lee los nombres de cada columna
+  char **campos;
+  campos = leer_linea_csv(archivo, ',');
+
+  // lee la linea correspondiente a una sala
+  while ((campos = leer_linea_csv(archivo, ',')) != NULL) {
+    Enemy *Actual = malloc(sizeof(Enemy));
+    if (Actual == NULL) {
+        perror("Error al asignar memoria para el enemigo");
+        continue;
+    }
+    // Asigna memoria para el nombre del enemigo
+    Actual->nombre = strdup(campos[0]);
+    sscanf(campos[1], "%d;%d;%d", &Actual->vida, &Actual->ataque, &Actual->defensa);
+    Actual->loot = NULL; // Puedes implementar la carga de loot si tienes la estructura
+    Actual->esJefe = (strcmp(campos[3], "True") == 0) ? true : false;
+    Actual->habilidades = strdup(campos[4]); 
+    // Agrega el enemigo a la lista
+    list_pushFront(listaEnemigos, Actual);
+  }
+  fclose(archivo); 
+}
