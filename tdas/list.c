@@ -2,20 +2,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-typedef struct Node {
-  void *data;
-  struct Node *next;
-} Node;
-
-struct List {
-  Node *head;
-  Node *tail;
-  Node *current;
-  int size;
-};
-
-typedef List List;
-
 List *list_create() {
   List *newList = (List *)malloc(sizeof(List));
   if (newList == NULL) {
