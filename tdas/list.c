@@ -218,3 +218,13 @@ void listDataClean(List *L) {
   L->current = NULL;
   L->size = 0;
 }
+
+void *list_get(List *lista, int index) {
+    if (!lista || index < 0 || index >= lista->size) return NULL;
+
+    Node *nodo = lista->head;
+    for (int i = 0; i < index && nodo; i++)
+        nodo = nodo->next;
+
+    return nodo ? nodo->data : NULL;
+}
