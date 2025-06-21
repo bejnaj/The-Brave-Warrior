@@ -349,23 +349,23 @@ void inventarioJugador (Jugador *P) {
 
             case 4: // 4) Aprender habilidades
                 int contadorSkills;
-                Skill **array = crearArraySkills(P -> inventario, &contadorSkills);
+                Skill **array = crearArraySkills(P -> inventario, &contadorSkills); // Crea un array con todas las habilidades disponibles a partir del inventario
                 puts("Habilidades disponibles:");
-                for (int i = 0 ; i < contadorSkills ; i++) {
+                for (int i = 0 ; i < contadorSkills ; i++) { // Printea las habilidaes
                     printf("%d) %s\n", (i + 1), array[i] -> nombre);
                 }
                 int num2;
                 while (1) {
                     printf("Elige cual quieres aprender (Si quieres cancelar esta accion, escribe \"SALIR\")");
-                    if (verificarOpcionConSalir(&num2, contadorSkills)) {
+                    if (verificarOpcionConSalir(&num2, contadorSkills)) { // Verifica la opcion y el "SALIR"
                         break;
                     }
                     else {
-                        aprenderSkill(P, array[num2-1]);
+                        aprenderSkill(P, array[num2-1]); // Aprende la skill elegida
                     }
                     
                 }
-                free(array);
+                free(array); // Limpia el array ya que no se va a seguir usando
                 break;
 
             case 5:
