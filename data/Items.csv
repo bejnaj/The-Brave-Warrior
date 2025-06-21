@@ -19,7 +19,7 @@ Estaca de Madera,noConsumible,arma,0;50;0,0,NULL,"Tiene 15 puntos de daño, perf
 Libro de los Gigantes,libroDeHabilidad,noEquipable,0;0;0,0,Dureza de Piel,"Aprende a duplicar tu defensa actual por 2 turnos, te sientes inmortal"
 Libro de la Regeneración,libroDeHabilidad,noEquipable,0;0;0,0,Regeneración,"Aprende a regenerar vida (+10) durante 3 turnos"
 Libro de la Bendición,libroDeHabilidad,noEquipable,0;0;0,0,Bendición,"Recibe una bendición que aumenta tu vida"
-Libro del En    furecimiento,libroDeHabilidad,noEquipable,0;0;0,0,Enfurecer,"Duplica tu daño durante 2 turnos"
+Libro del Enfurecimiento,libroDeHabilidad,noEquipable,0;0;0,0,Enfurecer,"Duplica tu daño durante 2 turnos"
 Libro de la Protección Divina,libroDeHabilidad,noEquipable,0;0;0,0,Protección Divina,"Triplica tu defensa durante 2 turnos"
 Libro de la Recuperación,libroDeHabilidad,noEquipable,0;0;0,0,Recuperación Rápida,"Recupera vida rápidamente durante 2 turnos"
 Libro de la Inspiración,libroDeHabilidad,noEquipable,0;0;0,0,Inspirar,"Aumenta tu daño durante 2 turnos"

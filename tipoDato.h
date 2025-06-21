@@ -9,8 +9,8 @@
 
 typedef enum {
     noEquipable,
-    arma,
-    armadura
+    ARMA,
+    ARMADURA
 } tipoEquipable;
 
 typedef enum {
@@ -55,6 +55,7 @@ typedef struct {
     tipoConsumible tipoCons;
     tipoEquipable tipoEquip;
     Bonus statBonus;
+    Skill *habilidadAprendida;
     int vidaRecuperada;
 } Item;
 
@@ -77,7 +78,7 @@ typedef struct {
     int duracion;
     tipoSkill tipo;
     int vidaCurada;
-    List *estado;
+    Status *estado;
     int hacia;
 } Skill;
 
@@ -104,7 +105,7 @@ typedef struct {
     int defensa;
     int nivel;
     List *inventario;
-    List *habilidades;
+    Skill *habilidades[2];
     List *efectos;
     Punto posicion;
 } Jugador;
