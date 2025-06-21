@@ -103,13 +103,13 @@ void leer_items(List *listaItems) {
     // Asigna memoria para el nombre del item
     Actual->nombre = strdup(campos[0]);
     // Como se usara el item
-    if (strcmp(campos[1], "noConsumible") == 0) Actual->tipoCons = noConsumible;
-    else if (strcmp(campos[1], "libroDeHabilidad") == 0) Actual->tipoCons = libroDeHabilidad;
-    else if (strcmp(campos[1], "tipoPocion") == 0) Actual->tipoCons = tipoPocion;
+    if (strcmp(campos[1], "noConsumible") == 0) Actual->tipoCons = 0;
+    else if (strcmp(campos[1], "libroDeHabilidad") == 0) Actual->tipoCons = 1;
+    else if (strcmp(campos[1], "tipoPocion") == 0) Actual->tipoCons = 2;
     // Donde se equipara el item
-    if (strcmp(campos[2], "noEquipable") == 0) Actual->tipoEquip = noEquipable;
-    else if (strcmp(campos[2], "arma") == 0) Actual->tipoEquip = arma;
-    else if (strcmp(campos[2], "armadura") == 0) Actual->tipoEquip = armadura;
+    if (strcmp(campos[2], "noEquipable") == 0) Actual->tipoEquip = 0;
+    else if (strcmp(campos[2], "arma") == 0) Actual->tipoEquip = 1;
+    else if (strcmp(campos[2], "armadura") == 0) Actual->tipoEquip = 2;
     // Asigna los bonus del item (separado por ';')
     int vida = 0, ataque = 0, defensa = 0;
     sscanf(campos[3], "%d;%d;%d", &vida, &ataque, &defensa);
