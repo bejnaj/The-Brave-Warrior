@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <stdbool.h>
-<<<<<<< HEAD
 #include <stdlib.h>
 #include <windows.h>
 #include <locale.h>
@@ -10,14 +9,101 @@
 #include "tipoDato.h"
 #include "random.h"
 #include "interfaces.c"
-=======
-#include "tipoDato.h"
-#include <tdas/list.h>
-#include <tdas/extra.h>
-#include <tdas/map.h>
-#include <stdlib.h>
 
->>>>>>> e11cafb1e9afd2d8ae4d45e76035dbfb4bfc74b2
+//// PROTOTIPO DE FUNCIONES
+
+// MISCELANEAS
+void limpiarSTDIN(); // Limpia el STDIN para asegurar el correcto funcionamiento de funciones que dependan de este (por ejemplo, fgets)
+void verificarOpcion(int *, int); // Verifica que una opcion numerica este entre 1 y un limite especificado
+int verificarOpcionConSalir(int *, int); // Verifica que una opcion numerica este entre 1 y "limite" o contenga palabra clave "SALIR"
+// RETURN
+// 0: No contiene la palabra clave "SALIR"
+// 1: Contiene la palabra clave 
+
+// CREACION DEL NIVEL
+Escenario **crearMatriz(Map *, Map *, Jugador *, Map *); // Crea la matriz 5x5 de Escenario que representara al nivel actual junto a sus parametros predeterminados, ademas de establecer una nueva posicion aleatoria del jugador.
+
+// FUNCIONES DE LIMPIEZA
+void limpiarListaEstado(List *); // Limpia los elementos y nodos de una listas de estados
+void limpiarListaHabilidades(List *); // Limpia los elementos y nodos de una listas de habilidades
+void limpiarEnemigo(Enemy *); // Limpia los elementos de un enemigo
+void borrarLibro(List *, char *); // Borra la primera ocurrencia de un libro en una lista
+void limpiarPiso(Escenario ***); // Obtiene un puntero a una matriz de Escenario (Escenario ***), limpia todos sus elementos (Escenario contiene punteros y datos estaticos, por lo que no es necesario limpiar mas adentro) y luego marca el dato como NULL
+
+//// MOVIMIENTO EN LA MAZMORRA
+void movimientoMazmorra(Jugador *, Escenario **); // Funcion encargada de mover al jugador en la direccion deseada
+int procesarTurno(Jugador *, Escenario **); // Procesa el turno, retornando un valor segun sea el estado de este
+// RETURN
+// 0: Muerte, fin del juego
+// 1: Avanzar piso
+// 2: No hacer nada
+
+// INVENTARIO DEL JUGADOR
+Skill **crearArraySkills(List *, int *); // Crea un array que contenga las skills que se pueden aprender (usando los libros del inventario)
+void aprenderSkill(Jugador *, Skill *); // Aprende una skill en el primer slot disponible o pregunta cual quiere reemplazar
+void inventarioJugador(Jugador *); // Muestra diferentes opciones al jugador y permite que este seleccione alguna
+// 1) Ver todo el inventario
+// 2) Ver objetos usables en combate
+// 3) Ver habilidades aprendidas
+// 4) Aprender habilidades
+// 5) Salir del menu
+
+
+//// FUNCIONES MISCELANEAS
+
+void limpiarSTDIN() {
+    int ch;
+    while ((ch = getchar()) != '\n' && ch != EOF);
+}
+
+void verificarOpcion(int *num, int limite) { 
+    char str[3];
+    limpiarSTDIN();
+    while (1) {
+        fgets(str, 3, stdin);
+        if (str[strlen(str) - 1] != '\n') { //Se revisa si el usuario escribio mas de 2 caracteres
+            limpiarSTDIN(); // Limpiar stdin para leer correctamente el proximo input
+        } 
+        else {
+            if (isdigit(str[0]) && str[1] == '\n') { //En caso de que el numero ingresado no sea valido
+                *num = str[0] - '0';
+                if (*num > 0 && *num <= limite) break;
+            }
+        }
+        puts("Ingresa una opcion Valida");
+    }
+}
+
+int verificarOpcionConSalir(int *num, int limite) { // Verifica que una opcion numerica este entre 1 y "limite" o contenga palabra clave "SALIR"
+    // return
+    // 0: No contiene la palabra clave "SALIR"
+    // 1: Contiene la palabra clave 
+    char str[7];
+    limpiarSTDIN();
+    while (1) {
+        fgets(str, sizeof(str), stdin);
+
+        if (str[strlen(str) - 1] != '\n') { //Se revisa si el usuario escribio mas de 2 caracteres
+            limpiarSTDIN(); // Limpiar stdin para leer correctamente el proximo input
+        }
+        str[strcspn(str, "\n")] = '\0'; // Quita el salto de linea
+
+        if (strcmp(str, "SALIR") == 0) return 1; // Contiene palabra clave
+    
+         // Verificar si es un número válido
+        if (strlen(str) == 1 && isdigit(str[0])) {
+            *num = str[0] - '0';
+            if (*num > 0 && *num <= limite) {
+                break;
+            }
+        }
+        puts("Ingresa una opcion Valida");
+    }
+    return 0; // No contiene palabra clave
+}
+
+
+//// CREACION DEL NIVEL
 
 Escenario **crearMatriz(Map *mapaItems, Map *mapaEnemigos, Jugador *P, Map *mapaJefes) {
     Escenario **matriz = malloc(sizeof(Escenario *) * 5); // Se almacena memoria para cada Escenario *
@@ -79,28 +165,63 @@ Escenario **crearMatriz(Map *mapaItems, Map *mapaEnemigos, Jugador *P, Map *mapa
     return matriz;
 }
 
-void limpiarSTDIN() {
-    int ch;
-    while ((ch = getchar()) != '\n' && ch != EOF);
-}
 
-void verificarOpcion(int *num, int limite) { // Verifica que una opcion numerica este entre 1 y "limite"
-    char str[3];
-    limpiarSTDIN();
-    while (1) {
-        fgets(str, 3, stdin);
-        if (str[strlen(str) - 1] != '\n') { //Se revisa si el usuario escribio mas de 2 caracteres
-            limpiarSTDIN(); // Limpiar stdin para leer correctamente el proximo input
-        } 
-        else {
-            if (isdigit(str[0]) && str[1] == '\n') { //En caso de que el numero ingresado no sea valido
-                *num = str[0] - '0';
-                if (*num > 0 && *num <= limite) break;
-            }
-        }
-        puts("Ingresa una opcion Valida");
+//// FUNCIONES DE LIMPIEZA
+
+void limpiarListaEstado(List *L) { 
+    for (Status *actual = list_first(L); actual != NULL ; actual = list_first(L)) {
+        list_popCurrent(L);
+        free(actual);
     }
 }
+
+void limpiarListaHabilidades(List *L) { 
+    for (Skill *actual = list_first(L); actual != NULL ; actual = list_first(L)) {
+        free(actual -> nombre);
+        list_popCurrent(L);
+        free(actual);
+    }
+}
+
+void limpiarEnemigo(Enemy *E) { 
+    free(E -> nombre); //Limpia el nombre guardado dinamicamente
+    list_clean(E -> loot); // Limpia la lista de loot, que contiene punteros a Item
+    free(E -> loot);
+
+    limpiarListaEstado(E -> estado); // Limpia la lista de estados
+    free(E -> estado);
+    E -> estado = NULL;
+
+    limpiarListaHabilidades(E -> habilidades);
+    free(E -> habilidades);
+    free(E);
+}
+
+void borrarLibro(List *L, char *nombreSkill) {
+    for (Item *actual = list_first(L); actual != NULL ; actual = list_next(L)) {
+        if (actual -> habilidadAprendida != NULL && strcmp((actual -> habilidadAprendida -> nombre), nombreSkill) == 0) {
+            list_popCurrent(L);
+            break;
+        }
+    }
+}
+
+void limpiarPiso(Escenario ***S) {
+    // Sabiendo que es una matriz de 5x5
+    for (int i = 0 ; i < 5 ; i++) {  // Recorrer cada elemento de la matriz (Escenario *) y lib
+        for (int j = 0 ; j < 5 ; j++) {
+            if ((*S)[i][j].enemigo != NULL)
+                limpiarEnemigo((*S)[i][j].enemigo);
+        } 
+        free((*S)[i]);
+        (*S)[i] = NULL;
+    }
+    free(*S);
+    *S = NULL;
+}
+
+
+//// MOVIMIENTO EN LA MAZMORRA
 
 void movimientoMazmorra(Jugador *P, Escenario **S) { // Funcion encargada de mover al jugador en la direccion deseada
     int num;
@@ -151,51 +272,6 @@ void movimientoMazmorra(Jugador *P, Escenario **S) { // Funcion encargada de mov
     }
 }
 
-void limpiarListaEstado(List *L) { // Limpia los elementos y nodos de una listas de estados
-    for (Status *actual = list_first(L); actual != NULL ; actual = list_first(L)) {
-        list_popCurrent(L);
-        free(actual);
-    }
-}
-
-void limpiarListaHabilidades(List *L) { // Limpia los elementos y nodos de una listas de habilidades
-    for (Skill *actual = list_first(L); actual != NULL ; actual = list_first(L)) {
-        free(actual -> nombre);
-        list_popCurrent(L);
-        free(actual);
-    }
-}
-
-void limpiarEnemigo(Enemy *E) { // Limpia los elementos de un enemigo
-    free(E -> nombre); //Limpia el nombre guardado dinamicamente
-    list_clean(E -> loot); // Limpia la lista de loot, que contiene punteros a Item
-    free(E -> loot);
-
-    limpiarListaEstado(E -> estado); // Limpia la lista de estados
-    free(E -> estado);
-    E -> estado = NULL;
-
-    limpiarListaHabilidades(E -> habilidades);
-    free(E -> habilidades);
-    free(E);
-}
-
-
-void limpiarPiso(Escenario ***S) { // Obtiene un puntero a una matriz de Escenario (Escenario ***), limpia todos sus elementos (Escenario contiene punteros y datos estaticos, por lo que no es necesario limpiar mas adentro) y luego marca el dato como NULL
-    // Sabiendo que es una matriz de 5x5
-    for (int i = 0 ; i < 5 ; i++) {  // Recorrer cada elemento de la matriz (Escenario *) y lib
-        for (int j = 0 ; j < 5 ; j++) {
-            if ((*S)[i][j].enemigo != NULL)
-                limpiarEnemigo((*S)[i][j].enemigo);
-        } 
-        free((*S)[i]);
-        (*S)[i] = NULL;
-    }
-    free(*S);
-    *S = NULL;
-}
-
-
 int procesarTurno(Jugador *P, Escenario **S) { //Procesa el turno, retornando un valor segun sea el estado de este
     //returns:
     //0: muerte
@@ -239,6 +315,9 @@ int procesarTurno(Jugador *P, Escenario **S) { //Procesa el turno, retornando un
     return 2;
 }
 
+
+//// INVENTARIO DEL JUGADOR
+
 Skill **crearArraySkills(List *L, int *cantSkills) { // Crea un array que contenga las skills que se pueden aprender (usando los libros del inventario)
     int cont = 0;   
     int max = 20;
@@ -257,43 +336,6 @@ Skill **crearArraySkills(List *L, int *cantSkills) { // Crea un array que conten
     }
     *cantSkills = cont;
     return array;
-}
-
-int verificarOpcionConSalir(int *num, int limite) { // Verifica que una opcion numerica este entre 1 y "limite" o contenga palabra clave "SALIR"
-    // return
-    // 0: No contiene la palabra clave "SALIR"
-    // 1: Contiene la palabra clave 
-    char str[7];
-    limpiarSTDIN();
-    while (1) {
-        fgets(str, sizeof(str), stdin);
-
-        if (str[strlen(str) - 1] != '\n') { //Se revisa si el usuario escribio mas de 2 caracteres
-            limpiarSTDIN(); // Limpiar stdin para leer correctamente el proximo input
-        }
-        str[strcspn(str, "\n")] = '\0'; // Quita el salto de linea
-
-        if (strcmp(str, "SALIR") == 0) return 1; // Contiene palabra clave
-    
-         // Verificar si es un número válido
-        if (strlen(str) == 1 && isdigit(str[0])) {
-            *num = str[0] - '0';
-            if (*num > 0 && *num <= limite) {
-                break;
-            }
-        }
-        puts("Ingresa una opcion Valida");
-    }
-    return 0; // No contiene palabra clave
-}
-
-void borrarLibro(List *L, char *nombreSkill) {
-    for (Item *actual = list_first(L); actual != NULL ; actual = list_next(L)) {
-        if (actual -> habilidadAprendida != NULL && strcmp((actual -> habilidadAprendida -> nombre), nombreSkill) == 0) {
-            list_popCurrent(L);
-            break;
-        }
-    }
 }
 
 void aprenderSkill(Jugador *P, Skill *H) { // Aprende una skill en el primer slot disponible o pregunta cual quiere reemplazar
@@ -328,7 +370,7 @@ void aprenderSkill(Jugador *P, Skill *H) { // Aprende una skill en el primer slo
     printf("Aprendiste la Habilidad %s \n", H -> nombre);
 }
 
-void inventarioJugador (Jugador *P) {
+void inventarioJugador(Jugador *P) {
     int num;
     while(1) {
         puts("Selecciona una opcion:");
@@ -436,6 +478,8 @@ void inventarioJugador (Jugador *P) {
         }
     }
 }
+
+//// MAIN
 
 int main() {
     SetConsoleOutputCP(CP_UTF8);      // Para que la consola imprima UTF-8
