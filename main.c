@@ -1,14 +1,14 @@
 #include <stdio.h>
 #include <stdbool.h>
+#include "tipoDato.h"
 #include <tdas/list.h>
 #include <tdas/extra.h>
 #include <tdas/map.h>
 #include <stdlib.h>
-#include <tipoDato.h>
+
 
 Escenario **crearMatriz(Map *mapaItems, Map *mapaEnemigos, Jugador *P, Map *mapaJefes) {
     Escenario **matriz = malloc(sizeof(Escenario *) * 5); // Se almacena memoria para cada Escenario *
-
     for (int i = 0 ; i < 5 ; i++) { // Se recorren todos los elementos del Escenario *
         matriz[i] = malloc(sizeof(Escenario) * 5); // Se almacena memoria para cada Escenario **
 
@@ -136,7 +136,52 @@ void movimientoMazmorra(Jugador *P, Escenario **S) { // Funcion encargada de mov
     }
 }
 
-int procesarTurno(Jugador *P, Escenario **S) {
+void limpiarListaEstado(List *L) { // Limpia los elementos y nodos de una listas de estados
+    for (Status *actual = list_first(L); actual != NULL ; actual = list_first(L)) {
+        list_popCurrent(L);
+        free(actual);
+    }
+}
+
+void limpiarListaHabilidades(List *L) { // Limpia los elementos y nodos de una listas de habilidades
+    for (Skill *actual = list_first(L); actual != NULL ; actual = list_first(L)) {
+        free(actual -> nombre);
+        list_popCurrent(L);
+        free(actual);
+    }
+}
+
+void limpiarEnemigo(Enemy *E) { // Limpia los elementos de un enemigo
+    free(E -> nombre); //Limpia el nombre guardado dinamicamente
+    list_clean(E -> loot); // Limpia la lista de loot, que contiene punteros a Item
+    free(E -> loot);
+
+    limpiarListaEstado(E -> estado); // Limpia la lista de estados
+    free(E -> estado);
+    E -> estado = NULL;
+
+    limpiarListaHabilidades(E -> habilidades);
+    free(E -> habilidades);
+    free(E);
+}
+
+
+void limpiarPiso(Escenario ***S) { // Obtiene un puntero a una matriz de Escenario (Escenario ***), limpia todos sus elementos (Escenario contiene punteros y datos estaticos, por lo que no es necesario limpiar mas adentro) y luego marca el dato como NULL
+    // Sabiendo que es una matriz de 5x5
+    for (int i = 0 ; i < 5 ; i++) {  // Recorrer cada elemento de la matriz (Escenario *) y lib
+        for (int j = 0 ; j < 5 ; j++) {
+            if ((*S)[i][j].enemigo != NULL)
+                limpiarEnemigo((*S)[i][j].enemigo);
+        } 
+        free((*S)[i]);
+        (*S)[i] = NULL;
+    }
+    free(*S);
+    *S = NULL;
+}
+
+
+int procesarTurno(Jugador *P, Escenario **S) { //Procesa el turno, retornando un valor segun sea el estado de este
     //returns:
     //0: muerte
     //1: avanzar piso
@@ -151,10 +196,9 @@ int procesarTurno(Jugador *P, Escenario **S) {
                 break;
 
             case ENEMIGO:
-                if (interfazDeCombate(P, aux -> enemigo)) // Suponiendo que retorna 1 si fue victoria y 0 si fue derrota
-                    break;
-                else
+                if (!interfazDeCombate(P, aux -> enemigo)) // Suponiendo que retorna 1 si fue victoria y 0 si fue derrota
                     return 0;
+                break;
 
             case ITEM:
                 interfazDeItem(P, aux -> objeto);
@@ -176,7 +220,7 @@ int procesarTurno(Jugador *P, Escenario **S) {
                 break;
         }
     } else
-        puts("Este escenario ya fue visitado previamente.");
+        puts("Ya has vistado este escenario previamente.");
     return 2;
 }
 
@@ -201,6 +245,9 @@ Skill **crearArraySkills(List *L, int *cantSkills) { // Crea un array que conten
 }
 
 int verificarOpcionConSalir(int *num, int limite) { // Verifica que una opcion numerica este entre 1 y "limite" o contenga palabra clave "SALIR"
+    // return
+    // 0: No contiene la palabra clave "SALIR"
+    // 1: Contiene la palabra clave 
     char str[7];
     limpiarSTDIN();
     while (1) {
@@ -225,10 +272,10 @@ int verificarOpcionConSalir(int *num, int limite) { // Verifica que una opcion n
     return 0; // No contiene palabra clave
 }
 
-void borrarLibro(Jugador *P, char *nombreSkill) {
-    for (Item *actual = list_first(P -> inventario); actual != NULL ; actual = list_next(P -> inventario)) {
-        if (actual -> habilidadAprendida != NULL && strcmp(actual -> habilidadAprendida -> nombre, nombreSkill) == 0) {
-            list_popCurrent(P -> inventario);
+void borrarLibro(List *L, char *nombreSkill) {
+    for (Item *actual = list_first(L); actual != NULL ; actual = list_next(L)) {
+        if (actual -> habilidadAprendida != NULL && strcmp((actual -> habilidadAprendida -> nombre), nombreSkill) == 0) {
+            list_popCurrent(L);
             break;
         }
     }
@@ -362,6 +409,7 @@ void inventarioJugador (Jugador *P) {
                     }
                     else {
                         aprenderSkill(P, array[num2-1]); // Aprende la skill elegida
+                        break;
                     }
                     
                 }
