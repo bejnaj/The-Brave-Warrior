@@ -139,7 +139,7 @@ void leer_items(List *listaItems) {
   fclose(archivo); 
 }
 
-void leer_Enemies(List *listaEnemigos) {
+void leer_Enemies(List *listaEnemigos, List *listaItems) {
   FILE *archivo = fopen("data/Enemies.csv", "r");
   if (archivo == NULL) {
     perror(
@@ -161,7 +161,7 @@ void leer_Enemies(List *listaEnemigos) {
     // Asigna memoria para el nombre del enemigo
     Actual->nombre = strdup(campos[0]);
     sscanf(campos[1], "%d;%d;%d", &Actual->vida, &Actual->ataque, &Actual->defensa);
-    Actual->loot = NULL; // Puedes implementar la carga de loot si tienes la estructura
+    asignarLootAleatorio(Actual, listaItems);
     Actual->esJefe = (strcmp(campos[3], "True") == 0) ? true : false;
     Actual->habilidades = strdup(campos[4]); 
     // Agrega el enemigo a la lista
