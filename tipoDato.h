@@ -1,3 +1,4 @@
+#ifndef TIPOS_H
 #define TIPOS_H
 #include <stdbool.h>
 #include "tdas/list.h"
@@ -6,6 +7,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+//// ENUMS
 
 typedef enum {
     noEquipable,
@@ -43,11 +46,31 @@ typedef enum {
     JEFE
 } tipoEvento;
 
+//// STRUCTS
+
 typedef struct {
     int vidaBonus;
     int AtaqueBonus;
     int DefensaBonus;
 } Bonus;
+
+typedef struct {
+    int id;
+    tipoStatus tipo;
+    operacion op;
+    float cantidad;
+    int costeTurnos;
+} Status;
+
+typedef struct {
+    char *nombre;
+    int cooldown;
+    int duracion;
+    tipoSkill tipo;
+    int vidaCurada;
+    Status *estado;
+    int hacia;
+} Skill;
 
 typedef struct {
     char *nombre;
@@ -71,24 +94,6 @@ typedef struct {
     List *estado;
     List *habilidades;
 } Enemy;
-
-typedef struct {
-    char *nombre;
-    int cooldown;
-    int duracion;
-    tipoSkill tipo;
-    int vidaCurada;
-    Status *estado;
-    int hacia;
-} Skill;
-
-typedef struct {
-    int id;
-    tipoStatus tipo;
-    operacion op;
-    float cantidad;
-    int costeTurnos;
-} Status;
 
 typedef struct {
     int posX;
@@ -118,3 +123,4 @@ typedef struct {
     bool visitado;
 } Escenario;
 
+#endif // TIPOS_H
