@@ -1,8 +1,8 @@
-#include <lectura.c>
-#include <tdas/extra.h>
-#include <tdas/list.h>
-#include <tdas/map.h>
-#include <tipoDato.h>
+#include "lectura.c"
+#include "tdas/extra.h"
+#include "tdas/list.h"
+#include "tdas/map.h"
+#include "tipoDato.h"
 
 void leer_status(List *listaStatus);
 

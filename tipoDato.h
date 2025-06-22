@@ -1,8 +1,8 @@
 #define TIPOS_H
 #include <stdbool.h>
-#include <tdas/list.h>
-#include <tdas/map.h>
-#include <tdas/extra.h>
+#include "tdas/list.h"
+#include "tdas/map.h"
+#include "tdas/extra.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

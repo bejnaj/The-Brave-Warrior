@@ -1,7 +1,8 @@
-#include <tdas/extra.h>
-#include <tdas/list.h>
-#include <tdas/map.h>
-#include <tipoDato.h>
+#include "tdas/extra.h"
+#include "tdas/list.h"
+#include "tdas/map.h"
+#include "tipoDato.h"
+
 void leer_status(List *listaStatus) {
   FILE *archivo = fopen("data/Status.csv", "r");
   if (archivo == NULL) {
@@ -26,13 +27,13 @@ void leer_status(List *listaStatus) {
     Actual->id = atoi(campos[0]);
     char *efectoDeStatus = strdup(campos[1]);
     if (strcmp(efectoDeStatus, "Vida"))
-        Actual->tipo = 0;
+        Actual->tipo = vida;
     else if (strcmp(efectoDeStatus, "daño"))
-        Actual->tipo = 1;
+        Actual->tipo = daño;
     else if (strcmp(efectoDeStatus, "defensa"))
-        Actual->tipo = 2;
+        Actual->tipo = defensa;
     else if (strcmp(efectoDeStatus, "saltarTurno"))
-        Actual->tipo = 3;
+        Actual->tipo = saltarTurno;
     Actual->costeTurnos = atoi(campos[3]);
     char *TipoOperacion = strdup(campos[4]);
     if (strcmp(campos[4], "suma") == 0) Actual->op = 0;
@@ -45,7 +46,13 @@ void leer_status(List *listaStatus) {
   fclose(archivo); 
 }
 
-void leer_skills(List *listaSkills) {
+int cmpId(void *a, void *b) {
+    Status *sa = (Status *)a;
+    int *id = (int *)b;
+    return sa->id - *id;
+}
+
+void leer_skills(List *listaSkills, List *listaStatus) {
   FILE *archivo = fopen("data/Skills.csv", "r");
   if (archivo == NULL) {
     perror(
@@ -73,7 +80,14 @@ void leer_skills(List *listaSkills) {
     if (strcmp(campos[3], "curacion") == 0) Actual->tipo = curacion;
     else if (strcmp(campos[3], "estado") == 0) Actual->tipo = estado;
     Actual->vidaCurada = atoi(campos[4]);
-    Actual->estado = NULL; // Puedes implementar la carga de estados si tienes la estructura
+    Status *estado = NULL;
+    if (strcmp(campos[5], "NULL") != 0) {
+        int idEstado = atoi(campos[5]);
+        Status *estado = (Status *)list_find(listaStatus, &idEstado, cmpId);
+        Actual->estado = estado;
+    } else {
+        Actual->estado = NULL;
+    }
     Actual->hacia = atoi(campos[6]);
     // Agrega la habilidad a la lista
     list_pushFront(listaSkills, Actual);
@@ -81,11 +95,16 @@ void leer_skills(List *listaSkills) {
   fclose(archivo); 
 }
 
-void leer_items(List *listaItems) {
+int cmpSkill(void *a, void *b) {
+    Skill *sa = (Skill *)a;
+    char *nombre = (char *)b;
+    return strcmp(sa->nombre, nombre);
+}
+
+void leer_items(List *listaItems, List *listaSkills) {
   FILE *archivo = fopen("data/Items.csv", "r");
   if (archivo == NULL) {
-    perror(
-        "Error al abrir el archivo");
+    perror("Error al abrir el archivo");
     return;
   }
 
@@ -93,23 +112,25 @@ void leer_items(List *listaItems) {
   char **campos;
   campos = leer_linea_csv(archivo, ','); 
 
-  // lee la linea correspondiente a una sala
+  // lee la linea correspondiente a un item
   while ((campos = leer_linea_csv(archivo, ',')) != NULL) {
     Item *Actual = malloc(sizeof(Item));
     if (Actual == NULL) {
-        perror("Error al asignar memoria para la habilidad");
+        perror("Error al asignar memoria para el item");
         continue;
     }
     // Asigna memoria para el nombre del item
     Actual->nombre = strdup(campos[0]);
     // Como se usara el item
-    if (strcmp(campos[1], "noConsumible") == 0) Actual->tipoCons = 0;
-    else if (strcmp(campos[1], "libroDeHabilidad") == 0) Actual->tipoCons = 1;
-    else if (strcmp(campos[1], "tipoPocion") == 0) Actual->tipoCons = 2;
+    if (strcmp(campos[1], "noConsumible") == 0) Actual->tipoCons = noConsumible;
+    else if (strcmp(campos[1], "libroDeHabilidad") == 0) Actual->tipoCons = libroDeHabilidad;
+    else if (strcmp(campos[1], "tipoPocion") == 0) Actual->tipoCons = tipoPocion;
+
     // Donde se equipara el item
-    if (strcmp(campos[2], "noEquipable") == 0) Actual->tipoEquip = 0;
-    else if (strcmp(campos[2], "arma") == 0) Actual->tipoEquip = 1;
-    else if (strcmp(campos[2], "armadura") == 0) Actual->tipoEquip = 2;
+    if (strcmp(campos[2], "noEquipable") == 0) Actual->tipoEquip = noEquipable;
+    else if (strcmp(campos[2], "arma") == 0) Actual->tipoEquip = ARMA;
+    else if (strcmp(campos[2], "armadura") == 0) Actual->tipoEquip = ARMADURA;
+    
     // Asigna los bonus del item (separado por ';')
     int vida = 0, ataque = 0, defensa = 0;
     sscanf(campos[3], "%d;%d;%d", &vida, &ataque, &defensa);
@@ -118,6 +139,19 @@ void leer_items(List *listaItems) {
     Actual->statBonus.DefensaBonus = defensa;
     // Asigna la vida recuperada por el item
     Actual->vidaRecuperada = atoi(campos[4]);
+    // Enlaza la habilidad aprendida si corresponde
+    if (strcmp(campos[5], "NULL") == 0) {
+        Actual->habilidadAprendida = NULL;
+    } else {
+        // Buscar la skill por nombre en listaSkills
+        Skill *skill = NULL;
+        if (strcmp(campos[5], "NULL") == 0) {
+            Actual->habilidadAprendida = NULL;
+        } else {
+            Skill *found = (Skill *)list_find(listaSkills, campos[5], cmpSkill);
+            Actual->habilidadAprendida = found;
+        }
+    }
     // Asigna la descripcion del item
     char *comillaInicio = strchr(campos[6], '"');
     char *comillaFin = NULL;
@@ -139,11 +173,16 @@ void leer_items(List *listaItems) {
   fclose(archivo); 
 }
 
-void leer_Enemies(List *listaEnemigos) {
+int cmpItem(void *a, void *b) {
+    Item *ia = (Item *)a;
+    char *nombre = (char *)b;
+    return strcmp(ia->nombre, nombre);
+}
+
+void leer_Enemies(List *listaEnemigos, List *listaSkills, List *listaItems) {
   FILE *archivo = fopen("data/Enemies.csv", "r");
   if (archivo == NULL) {
-    perror(
-        "Error al abrir el archivo");
+    perror("Error al abrir el archivo");
     return;
   }
 
@@ -151,7 +190,7 @@ void leer_Enemies(List *listaEnemigos) {
   char **campos;
   campos = leer_linea_csv(archivo, ',');
 
-  // lee la linea correspondiente a una sala
+  // lee la linea correspondiente a un enemigo
   while ((campos = leer_linea_csv(archivo, ',')) != NULL) {
     Enemy *Actual = malloc(sizeof(Enemy));
     if (Actual == NULL) {
@@ -161,9 +200,31 @@ void leer_Enemies(List *listaEnemigos) {
     // Asigna memoria para el nombre del enemigo
     Actual->nombre = strdup(campos[0]);
     sscanf(campos[1], "%d;%d;%d", &Actual->vida, &Actual->ataque, &Actual->defensa);
-    Actual->loot = NULL; // Puedes implementar la carga de loot si tienes la estructura
+    Actual->vidaActual = Actual->vida; // Inicializa vidaActual con vida total
+    Actual->loot = list_create();
+    if (strcmp(campos[2], "NULL") != 0 && strlen(campos[2]) > 0) {
+      char *lootStr = strdup(campos[2]);
+      char *token = strtok(lootStr, ";");
+      while (token != NULL) {
+        Item *itemActual = (Item *)list_find(listaItems, token, cmpItem);
+        if (itemActual) list_pushBack(Actual->loot, itemActual);
+        token = strtok(NULL, ";");
+      }
+    free(lootStr);
+    }
     Actual->esJefe = (strcmp(campos[3], "True") == 0) ? true : false;
-    Actual->habilidades = strdup(campos[4]); 
+    // Procesa habilidades (puede haber varias separadas por ';')
+    Actual->habilidades = list_create();
+    if (strcmp(campos[4], "NULL") != 0) {
+        char *habilidadesStr = strdup(campos[4]);
+        char *token = strtok(habilidadesStr, ";");
+        while (token != NULL) {
+            Skill *habilidadActual = (Skill *)list_find(listaSkills, token, cmpSkill);
+            if (habilidadActual) list_pushBack(Actual->habilidades, habilidadActual);
+            token = strtok(NULL, ";");
+        }
+        free(habilidadesStr);
+    }
     // Agrega el enemigo a la lista
     list_pushFront(listaEnemigos, Actual);
   }

@@ -1,10 +1,14 @@
 #include <stdio.h>
 #include <stdbool.h>
-#include <tdas/list.h>
-#include <tdas/extra.h>
-#include <tdas/map.h>
 #include <stdlib.h>
-#include <tipoDato.h>
+#include <windows.h>
+#include <locale.h>
+#include "tdas/list.h"
+#include "tdas/extra.h"
+#include "tdas/map.h"
+#include "tipoDato.h"
+#include "random.h"
+#include "interfaces.c"
 
 Escenario **crearMatriz(Map *mapaItems, Map *mapaEnemigos, Jugador *P, Map *mapaJefes) {
     Escenario **matriz = malloc(sizeof(Escenario *) * 5); // Se almacena memoria para cada Escenario *
@@ -13,7 +17,8 @@ Escenario **crearMatriz(Map *mapaItems, Map *mapaEnemigos, Jugador *P, Map *mapa
         matriz[i] = malloc(sizeof(Escenario) * 5); // Se almacena memoria para cada Escenario **
 
         for (int j = 0 ; j < 5 ; j++) {
-            matriz[i][j].tipo = rand() % 3; // Tipo random entre 0-2
+            //matriz[i][j].tipo = rand() % 3; // Tipo random entre 0-2
+            matriz[i][j].tipo = randomRint(0,2);
             switch (matriz[i][j].tipo) { // Depende del tipo seleccionado
                 case VACIO:
                     matriz[i][j].enemigo = NULL;
@@ -39,7 +44,8 @@ Escenario **crearMatriz(Map *mapaItems, Map *mapaEnemigos, Jugador *P, Map *mapa
     }
 
     // Una vez terminados todos los escenarios, elegir el jefe aleatoriamente
-    int aux = rand() % 25; // Obtener numero random entre 0-24
+    //int aux = rand() % 25; // Obtener numero random entre 0-24
+    int aux = randomRint(0,24);
     int indX = aux / 5; // Posicion en X
     int indY = aux % 5; // Posicion en Y
     int jefeX = indX;
@@ -55,7 +61,8 @@ Escenario **crearMatriz(Map *mapaItems, Map *mapaEnemigos, Jugador *P, Map *mapa
 
     // Actualizar los datos del jugador (spawn aleatorio)
     do { // Asegurar que no aparezca en la sala del jefe
-        aux = rand() % 25; // Obtener numero random entre 0-24
+        //aux = rand() % 25; // Obtener numero random entre 0-24
+        aux = randomRint(0,24);
         indX = aux / 5; // Posicion en X
         indY = aux % 5; // Posicion en Y
     } while (jefeX == indX && jefeY == indY);
@@ -375,5 +382,14 @@ void inventarioJugador (Jugador *P) {
 }
 
 int main() {
-    return 1;
+    SetConsoleOutputCP(CP_UTF8);      // Para que la consola imprima UTF-8
+    setlocale(LC_ALL, "");            // Para que printf maneje tildes y ñ
+
+    init_random();
+    //elGuerrero();
+    printf("Bienvenido a la aventura del Guerrero más Bravo que hayas conocido\n");
+    printf("Menú Principal Beta\n");
+    
+    // ...resto de tu código...
+    return 0;
 }

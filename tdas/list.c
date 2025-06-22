@@ -228,3 +228,17 @@ void *list_get(List *lista, int index) {
 
     return nodo ? nodo->data : NULL;
 }
+
+// Busca un dato en la lista usando una función de comparación. Devuelve el puntero al dato si lo encuentra, NULL si no.
+void *list_find(List *L, void *dato, int (*cmp)(void *, void *)) {
+    if (!L || !cmp) return NULL;
+    Node *nodo = L->head;
+    while (nodo) {
+        if (cmp(nodo->data, dato) == 0) {
+            return nodo->data;
+        }
+        nodo = nodo->next;
+    }
+    return NULL;
+}
+

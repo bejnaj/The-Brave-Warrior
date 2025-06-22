@@ -2,23 +2,29 @@ nombre,{vida;ataque;defensa},loot,esJefe(bool),habilidades
 Goblin,50;10;5,NULL,False,Envenenar
 Goblin Guerrero,70;15;8,NULL,False,Herida Grave
 Goblin Chamán,60;8;4,NULL,False,Regeneración
+Rey Goblin,300;10;0,NULL,True,Envenenar;Herida Grave;Regeneración
 Orco,120;25;15,NULL,False,Enfurecer
 Orco Bruto,160;35;20,NULL,False,Aturdir
 Orco Chamán,100;15;10,NULL,False,Quemar
-Rey Orco,350;45;30,NULL,True,Enfurecer
+Rey Orco,350;40;30,NULL,True,Enfurecer;Aturdir;Quemar
 Esqueleto,60;12;6,NULL,False,Desangrar
 Esqueleto Arquero,55;18;4,NULL,False,Debilitar
 Esqueleto Mago,50;10;3,NULL,False,Envenenar
-Skeletron,150;28;15,NULL,True,Desangrar
-Slime,40;8;2,NULL,False,Envenenar
+Skeletron,150;28;15,NULL,True,Desangrar;DEbilitar;Envenenar
+Slime,40;8;2,NULL,False,NULL
 Slime Venenoso,60;12;4,NULL,False,Envenenar
-Rey Slime,200;25;10,NULL,True,Envenenar
+Rey Slime,200;25;10,NULL,True,Envenenar;Aturdir;NULL
 Bandido,80;20;8,NULL,False,Herida Grave
-Bandido Líder,140;30;12,NULL,True,Herida Grave
+Bandido Líder,140;30;12,NULL,False,Herida Grave
 Murciélago,30;7;2,NULL,False,Desangrar
 Murciélago Vampiro,80;18;6,NULL,False,Curación Menor
-Gran Vampiro,220;35;18,NULL,True,Curación Mayor
+Drácula,220;35;18,NULL,True,Desangrar;Curación Mayor;Congelar
 Lobo,70;16;7,NULL,False,Desangrar
-Lobo Alfa,150;28;14,NULL,True,Desangrar
+Lobo Alfa,150;28;14,NULL,False,Desangrar
 wizard,90;22;8,NULL,False,Maldecir
-Super Wizard,200;35;15,NULL,True,Maldecir 
+Super Wizard,200;35;15,NULL,True,Maldecir;Bola de Fuego;Recuperación Rápida
+Zombie,40;25;0,NULL,False,Debilitar
+Zombie con Casco,90;25;0,NULL,False,Debilitar
+Gigante,300;5;5,NULL,False,Blindaje
+Gigante Noble,350;10;10,NULL,False,Blindaje
+Completo Italiano,100;0;5,Mostaza,False,Enfurecer

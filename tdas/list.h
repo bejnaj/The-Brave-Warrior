@@ -45,4 +45,6 @@ int list_size(List* L);
 
 void *list_get(List *lista, int index);
 
+void *list_find(List *L, void *dato, int (*cmp)(void *, void *));
+
 #endif
