@@ -47,6 +47,7 @@ void inventarioJugador(Jugador *); // Muestra diferentes opciones al jugador y p
 // 3) Ver habilidades aprendidas
 // 4) Aprender habilidades
 // 5) Salir del menu
+void infoJugador(Jugador *); // Muestra la informacion basica acerca del jugadorf (vida, habilidades, arma y armadura equipadas y los efectos activos)
 
 
 //// FUNCIONES MISCELANEAS
@@ -171,6 +172,7 @@ Escenario **crearMatriz(Map *mapaItems, Map *mapaEnemigos, Jugador *P, Map *mapa
 void limpiarListaEstado(List *L) { 
     for (Status *actual = list_first(L); actual != NULL ; actual = list_first(L)) {
         list_popCurrent(L);
+        free(actual -> nombre);
         free(actual);
     }
 }
@@ -477,6 +479,33 @@ void inventarioJugador(Jugador *P) {
             return;
         }
     }
+}
+
+void infoJugador(Jugador *P) {
+    puts("=======================");
+    printf("Vida: %d/%d\n", P -> vidaActual, P -> vida);
+
+    printf("Arma: ");
+    P -> arma == NULL ? printf("Sin Arma\n") : printf("%s\n",P -> arma -> nombre);
+    printf("Armadura: ");
+    P -> armadura == NULL ? printf("Sin Armadura\n") : printf("%s\n", P -> armadura -> nombre);
+
+    bool flag = false;
+    puts("Habilidades disponibles:");
+    for (int i = 0 ; i < 2 ; i++) {
+        Skill *aux = P ->habilidades[i];
+        if (aux != NULL) {
+            printf("%s | Enfriamiento restante: %d\n", aux -> nombre, aux -> cooldownActual);
+            flag = true;
+        }
+    }
+    if (flag == false)
+        puts("Sin habilidades disponibles.");
+
+    puts("Efectos Activos:");
+    for (Status *actual = list_first(P -> efectos); actual != NULL ; actual = list_next(P -> efectos))
+        printf("%s | Duracion: %d turnos \n", actual -> nombre, actual -> duracion);
+    puts("=======================");
 }
 
 //// MAIN
