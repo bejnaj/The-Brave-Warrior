@@ -173,17 +173,7 @@ void leer_items(List *listaItems, List *listaSkills) {
   fclose(archivo); 
 }
 
-<<<<<<< HEAD
-int cmpItem(void *a, void *b) {
-    Item *ia = (Item *)a;
-    char *nombre = (char *)b;
-    return strcmp(ia->nombre, nombre);
-}
-
-void leer_Enemies(List *listaEnemigos, List *listaSkills, List *listaItems) {
-=======
-void leer_Enemies(List *listaEnemigos, List *listaItems) {
->>>>>>> e11cafb1e9afd2d8ae4d45e76035dbfb4bfc74b2
+void leer_Enemies(List *listaEnemigos, List *listaItems, List *listaSkills) {
   FILE *archivo = fopen("data/Enemies.csv", "r");
   if (archivo == NULL) {
     perror("Error al abrir el archivo");
@@ -204,22 +194,7 @@ void leer_Enemies(List *listaEnemigos, List *listaItems) {
     // Asigna memoria para el nombre del enemigo
     Actual->nombre = strdup(campos[0]);
     sscanf(campos[1], "%d;%d;%d", &Actual->vida, &Actual->ataque, &Actual->defensa);
-<<<<<<< HEAD
-    Actual->vidaActual = Actual->vida; // Inicializa vidaActual con vida total
-    Actual->loot = list_create();
-    if (strcmp(campos[2], "NULL") != 0 && strlen(campos[2]) > 0) {
-      char *lootStr = strdup(campos[2]);
-      char *token = strtok(lootStr, ";");
-      while (token != NULL) {
-        Item *itemActual = (Item *)list_find(listaItems, token, cmpItem);
-        if (itemActual) list_pushBack(Actual->loot, itemActual);
-        token = strtok(NULL, ";");
-      }
-    free(lootStr);
-    }
-=======
     asignarLootAleatorio(Actual, listaItems);
->>>>>>> e11cafb1e9afd2d8ae4d45e76035dbfb4bfc74b2
     Actual->esJefe = (strcmp(campos[3], "True") == 0) ? true : false;
     // Procesa habilidades (puede haber varias separadas por ';')
     Actual->habilidades = list_create();
