@@ -77,8 +77,8 @@ int usarObjeto(Jugador *P) {
     List *L = P -> inventario;
     if (list_first(L) == NULL) {
         printb("No tienes items en tu inventario.\n");
-        borrarLineas(2);
-        Sleep(1000);
+        borrarLineas(3);
+        Sleep(2000);
         return 2;
     }
     int max = 20;
@@ -171,28 +171,29 @@ bool intentarHuir(Jugador *P, Enemy *E){
         Sleep(500);
         printb("PIERDES EL TURNO!!\n\n");
         Sleep(1000);
-        borrarLineas(3);
+        borrarLineas(4);
         return false;
     }
 }
 
 void Habilidad(Jugador *P, Enemy E,int h, int lanzaSkill){ //lanzaSkill es quién lanza la habilidad (enemigo = 0 | jugador = 1) 
     //STATUS
-    char nombreEfecto[40] = P->habilidades[h]->estado->nombre;  // h es la posicion de la habilidad
+    char nombreEfecto[40];
+    strcpy(nombreEfecto, P->habilidades[h]->estado->nombre);  // h es la posicion de la habilidad
     int valor = P->habilidades[h]->estado->cantidad;
     int costeTurnos = P->habilidades[h]->estado->costeTurnos;
-    int duracion= P->habilidades[h]->estado->duracion;
+    int duracionEstado = P->habilidades[h]->estado->duracion;
     P->habilidades[h]->estado->tipo; //vida|dano|defensa|saltarTurno
     P->habilidades[h]->estado->op; //suma|multiplicacion
     //HABILIDADES
     int vidaCurada = P->habilidades[h]->vidaCurada;
     int duracion = P->habilidades[h]->duracion;
     P->habilidades[h]->tipo;//curacion|estado
-    char nombre[40] = P->habilidades[h]->nombre;
+    char nombre[40];
+    strcpy(nombre, P->habilidades[h]->nombre);
     int hacia = P->habilidades[h]->hacia; // 1 tiMismo | 0 Enemigo
     int cooldown = P->habilidades[h]->cooldown;
     int cooldownActual = P->habilidades[h]->cooldownActual;
-    
 }
 
 void Pelear(Jugador *P, Enemy *E){ //FALTA GESTIONAR LAS HABILIDADES, SI NO HAY ENTONCES SE INHABILITAN OPCIONES 2 U 3 DEPENDIENDO DE LA CANTIDAD.
@@ -278,7 +279,7 @@ void comenzarPelea(Jugador *P, Enemy *E/*, Map *status*/) {
         // Turno del jugador
         printb("Es tu turno\n");
         Sleep(1000);
-        verificarOpcionConBorrado(&num,3);
+        verificarOpcion(&num,3);
         switch (num)
         {
         case 1:
