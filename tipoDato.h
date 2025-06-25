@@ -56,15 +56,18 @@ typedef struct {
 
 typedef struct {
     int id;
+    char *nombre;
     tipoStatus tipo;
     operacion op;
     float cantidad;
     int costeTurnos;
+    int duracion;
 } Status;
 
 typedef struct {
     char *nombre;
     int cooldown;
+    int cooldownActual;
     int duracion;
     tipoSkill tipo;
     int vidaCurada;
