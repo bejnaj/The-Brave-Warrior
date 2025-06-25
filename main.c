@@ -9,16 +9,9 @@
 #include "tipoDato.h"
 #include "random.h"
 #include "interfaces.c"
+#include "miscelaneo.h"
 
 //// PROTOTIPO DE FUNCIONES
-
-// MISCELANEAS
-void limpiarSTDIN(); // Limpia el STDIN para asegurar el correcto funcionamiento de funciones que dependan de este (por ejemplo, fgets)
-void verificarOpcion(int *, int); // Verifica que una opcion numerica este entre 1 y un limite especificado
-int verificarOpcionConSalir(int *, int); // Verifica que una opcion numerica este entre 1 y "limite" o contenga palabra clave "SALIR"
-// RETURN
-// 0: No contiene la palabra clave "SALIR"
-// 1: Contiene la palabra clave 
 
 // CREACION DEL NIVEL
 Escenario **crearMatriz(Map *, Map *, Jugador *, Map *); // Crea la matriz 5x5 de Escenario que representara al nivel actual junto a sus parametros predeterminados, ademas de establecer una nueva posicion aleatoria del jugador.
@@ -47,60 +40,6 @@ void inventarioJugador(Jugador *); // Muestra diferentes opciones al jugador y p
 // 3) Ver habilidades aprendidas
 // 4) Aprender habilidades
 // 5) Salir del menu
-
-
-//// FUNCIONES MISCELANEAS
-
-void limpiarSTDIN() {
-    int ch;
-    while ((ch = getchar()) != '\n' && ch != EOF);
-}
-
-void verificarOpcion(int *num, int limite) { 
-    char str[3];
-    limpiarSTDIN();
-    while (1) {
-        fgets(str, 3, stdin);
-        if (str[strlen(str) - 1] != '\n') { //Se revisa si el usuario escribio mas de 2 caracteres
-            limpiarSTDIN(); // Limpiar stdin para leer correctamente el proximo input
-        } 
-        else {
-            if (isdigit(str[0]) && str[1] == '\n') { //En caso de que el numero ingresado no sea valido
-                *num = str[0] - '0';
-                if (*num > 0 && *num <= limite) break;
-            }
-        }
-        puts("Ingresa una opcion Valida");
-    }
-}
-
-int verificarOpcionConSalir(int *num, int limite) { // Verifica que una opcion numerica este entre 1 y "limite" o contenga palabra clave "SALIR"
-    // return
-    // 0: No contiene la palabra clave "SALIR"
-    // 1: Contiene la palabra clave 
-    char str[7];
-    limpiarSTDIN();
-    while (1) {
-        fgets(str, sizeof(str), stdin);
-
-        if (str[strlen(str) - 1] != '\n') { //Se revisa si el usuario escribio mas de 2 caracteres
-            limpiarSTDIN(); // Limpiar stdin para leer correctamente el proximo input
-        }
-        str[strcspn(str, "\n")] = '\0'; // Quita el salto de linea
-
-        if (strcmp(str, "SALIR") == 0) return 1; // Contiene palabra clave
-    
-         // Verificar si es un número válido
-        if (strlen(str) == 1 && isdigit(str[0])) {
-            *num = str[0] - '0';
-            if (*num > 0 && *num <= limite) {
-                break;
-            }
-        }
-        puts("Ingresa una opcion Valida");
-    }
-    return 0; // No contiene palabra clave
-}
 
 
 //// CREACION DEL NIVEL
