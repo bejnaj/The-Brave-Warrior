@@ -5,6 +5,9 @@
 // Limpia el STDIN para asegurar el correcto funcionamiento de funciones que dependan de este (por ejemplo, fgets)
 void limpiarSTDIN(); 
 
+// Para esperar a que el usuario realice una accion antes de seguir con el programa
+void esperarAccion() ;
+
 // Verifica que una opcion numerica este entre 1 y un limite especificado (siendo el maximo el 9)
 void verificarOpcion(int *, int); 
 

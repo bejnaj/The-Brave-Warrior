@@ -1,6 +1,13 @@
 {
     "files.associations": {
         "extra.h": "c",
-        "list.h": "c"
+        "list.h": "c",
+        "deque": "c",
+        "string": "c",
+        "vector": "c",
+        "random": "c",
+        "limits": "c",
+        "stdarg.h": "c",
+        "windows.h": "c"
     }
 }

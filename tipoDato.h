@@ -29,7 +29,7 @@ typedef enum {
 
 typedef enum {
     vida,
-    daño,
+    dano,
     defensa,
     saltarTurno
 } tipoStatus;

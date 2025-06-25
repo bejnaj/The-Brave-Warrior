@@ -8,13 +8,14 @@
 #include "tdas/map.h"
 #include "tipoDato.h"
 #include "random.h"
-#include "interfaces.c"
+#include "interfaces.h"
 #include "miscelaneo.h"
+#include "combate.h"
 
 //// PROTOTIPO DE FUNCIONES
 
 // CREACION DEL NIVEL
-Escenario **crearMatriz(Map *, Map *, Jugador *, Map *); // Crea la matriz 5x5 de Escenario que representara al nivel actual junto a sus parametros predeterminados, ademas de establecer una nueva posicion aleatoria del jugador.
+Escenario **crearMatriz(/*Map *, List *, */Jugador */*, List **/); // Crea la matriz 5x5 de Escenario que representara al nivel actual junto a sus parametros predeterminados, ademas de establecer una nueva posicion aleatoria del jugador.
 
 // FUNCIONES DE LIMPIEZA
 void limpiarListaEstado(List *); // Limpia los elementos y nodos de una listas de estados
@@ -30,6 +31,7 @@ int procesarTurno(Jugador *, Escenario **); // Procesa el turno, retornando un v
 // 0: Muerte, fin del juego
 // 1: Avanzar piso
 // 2: No hacer nada
+void mostrarNivel(Jugador *, Escenario **); // Muestra el estado del nivel actual
 
 // INVENTARIO DEL JUGADOR
 Skill **crearArraySkills(List *, int *); // Crea un array que contenga las skills que se pueden aprender (usando los libros del inventario)
@@ -40,12 +42,67 @@ void inventarioJugador(Jugador *); // Muestra diferentes opciones al jugador y p
 // 3) Ver habilidades aprendidas
 // 4) Aprender habilidades
 // 5) Salir del menu
-void infoJugador(Jugador *); // Muestra la informacion basica acerca del jugadorf (vida, habilidades, arma y armadura equipadas y los efectos activos)
+void infoJugador(Jugador *); // Muestra la informacion basica acerca del jugador (vida, habilidades, arma y armadura equipadas y los efectos activos)
+
+//// INTERFAZ DE TESORO
+void interfazDeTesoro(Jugador *, Item *);
+
+//// PARA TESTEO
+
+Item *crearItemPrueba() {
+    //nombre,tipoConsumible{noConsumible|libroDeHabilidad|tipoPocion},tipoEquipable{noEquipable|arma|armadura},{vida;daño;defensa},vidaRecuperada,habilidadAprendida,descripción
+    //Pan con Fiambre,tipoPocion,noEquipable,0;0;0,10,NULL,"Te curas 10 puntos de vida, no hay suficientes descripciones chistosas"
+    Item *I = malloc(sizeof(Item));
+    I -> nombre = strdup("Pan con Fiambre");
+    I -> tipoCons = tipoPocion;
+    I -> tipoEquip = noEquipable;
+    I -> statBonus.vidaBonus = 0;
+    I -> statBonus.AtaqueBonus = 0;
+    I -> statBonus.DefensaBonus = 0;
+    I -> vidaRecuperada = 10;
+    I -> habilidadAprendida = NULL;
+    I -> descripcion = strdup("Te curas 10 puntos de vida, no hay suficientes descripciones chistosas");
+    return I;
+} 
+
+Enemy *crearEnemigoPrueba() {
+    //nombre,{vida;ataque;defensa},loot,esJefe(bool),habilidades
+    //Slime,40;8;2,NULL,False,NULL
+    Enemy *E = malloc(sizeof(Enemy));
+    E -> nombre = strdup("Goblin");
+    E -> vida = 40;
+    E -> vidaActual = 40;
+    E -> ataque = 10;
+    E -> defensa = 2;
+    E -> loot = NULL;
+    E -> arma = NULL;
+    E -> esJefe = false;
+    E -> estado = NULL;
+    E -> habilidades = NULL;
+    return E;
+} 
+
+Enemy *crearJefePrueba() {
+    //nombre,{vida;ataque;defensa},loot,esJefe(bool),habilidades
+    //Slime,40;8;2,NULL,False,NULL
+    Enemy *E = malloc(sizeof(Enemy));
+    E -> nombre = strdup("Goblin");
+    E -> vida = 40;
+    E -> vidaActual = 40;
+    E -> ataque = 10;
+    E -> defensa = 2;
+    E -> loot = NULL;
+    E -> arma = NULL;
+    E -> esJefe = false;
+    E -> estado = NULL;
+    E -> habilidades = NULL;
+    return E;
+} 
 
 
 //// CREACION DEL NIVEL
 
-Escenario **crearMatriz(Map *mapaItems, Map *mapaEnemigos, Jugador *P, Map *mapaJefes) {
+Escenario **crearMatriz(/*Map *mapaItems, List *listaEnemigos,*/ Jugador *P/*, List *listaJefes*/) {
     Escenario **matriz = malloc(sizeof(Escenario *) * 5); // Se almacena memoria para cada Escenario *
     for (int i = 0 ; i < 5 ; i++) { // Se recorren todos los elementos del Escenario *
         matriz[i] = malloc(sizeof(Escenario) * 5); // Se almacena memoria para cada Escenario **
@@ -60,12 +117,14 @@ Escenario **crearMatriz(Map *mapaItems, Map *mapaEnemigos, Jugador *P, Map *mapa
                     break;
 
                 case ENEMIGO:
-                    matriz[i][j].enemigo = clonarEnemigo(mapaEnemigos, P);
+                    matriz[i][j].enemigo = crearEnemigoPrueba();
+                    //matriz[i][j].enemigo = clonarEnemigo(listaEnemigos, P);
                     matriz[i][j].objeto = NULL;
                     break;
             
                 case ITEM:
-                    matriz[i][j].objeto = clonarItem(mapaItems, P);
+                    //matriz[i][j].objeto = clonarItem(mapaItems, P);
+                    matriz[i][j].objeto = crearItemPrueba();
                     matriz[i][j].enemigo = NULL;
                     break;
             }
@@ -90,7 +149,8 @@ Escenario **crearMatriz(Map *mapaItems, Map *mapaEnemigos, Jugador *P, Map *mapa
     if (matriz[indX][indY].enemigo != NULL) { // Limpiar datos del enemigo previo si existia
          free(matriz[indX][indY].enemigo); 
     }
-    matriz[indX][indY].enemigo = clonarJefe(mapaJefes, P); 
+    //matriz[indX][indY].enemigo = clonarJefe(listaJefes, P); 
+    matriz[indX][indY].enemigo = crearJefePrueba();
     matriz[indX][indY].objeto = NULL;
 
     // Actualizar los datos del jugador (spawn aleatorio)
@@ -169,45 +229,58 @@ void movimientoMazmorra(Jugador *P, Escenario **S) { // Funcion encargada de mov
     bool flag = true; // Para controlar el loop hasta que se ingrese una opcion valida
     while (flag) {
         puts("Ingresa una direccion:");
-        puts("1) Arriba / 2) Abajo / 3) Izquierda / 4) Derecha");
-        verificarOpcion(&num, 4); // Obtiene y formatea la opcion elegida
+        puts("1) Arriba / 2) Abajo / 3) Izquierda / 4) Derecha / 5) Entrar al apartado de inventario");
+        verificarOpcion(&num, 5); // Obtiene y formatea la opcion elegida
+        borrarLineas(3);
         int tempX = P -> posicion.posX;
         int tempY = P -> posicion.posY;
         switch (num) {
-            case 1:
+            case 3:
                 if (tempY > 0) { // Si es posible hacer el movimiento
                     P -> posicion.posY -= 1;
                     flag = false;
                 }
                 else
                     puts("No es posible realizar ese movimiento.");
+                    Sleep(500);
+                    borrarLineas(1);
                 break;
 
-            case 2:
+            case 4:
                 if (tempY < 4) { // Si es posible hacer el movimiento
                     P -> posicion.posY += 1;
                     flag = false;
                 }
                 else
                     puts("No es posible realizar ese movimiento.");
+                    Sleep(500);
+                    borrarLineas(1); 
                 break;
 
-            case 3:
+            case 1:
                 if (tempX > 0) { // Si es posible hacer el movimiento
                     P -> posicion.posX -= 1;
                     flag = false;
                 }
                 else
                     puts("No es posible realizar ese movimiento.");
+                    Sleep(500);
+                    borrarLineas(1); 
                 break;
 
-            case 4:
+            case 2:
                 if (tempX < 4) { // Si es posible hacer el movimiento
                     P -> posicion.posX += 1;
                     flag = false;
                 }
                 else
                     puts("No es posible realizar ese movimiento.");
+                    Sleep(500);
+                    borrarLineas(1); 
+                break;
+            case 5:
+                borrarLineas(7);
+                inventarioJugador(P);
                 break;
         }
     }
@@ -224,19 +297,25 @@ int procesarTurno(Jugador *P, Escenario **S) { //Procesa el turno, retornando un
         aux -> visitado = true; // La marca como visitada
         switch (aux -> tipo) { // Revisa el tipo del escenario
             case VACIO:
+                borrarLineas(2);
                 puts("Mala suerte, esta sala esta vacia.");
+                Sleep(500);
+                borrarLineas(1); 
                 break;
 
             case ENEMIGO:
-                if (!interfazDeCombate(P, aux -> enemigo)) // Suponiendo que retorna 1 si fue victoria y 0 si fue derrota
-                    return 0;
+                borrarLineas(6); 
+                comenzarPelea(P, aux -> enemigo);
+                /*if (!comenzarPelea(P, aux -> enemigo)) // Suponiendo que retorna 1 si fue victoria y 0 si fue derrota
+                    return 0; */
                 break;
 
             case ITEM:
-                interfazDeItem(P, aux -> objeto);
+                interfazDeTesoro(P, aux -> objeto);
                 break;
 
-            case JEFE:
+            case JEFE: {
+                borrarLineas(6); 
                 int num;
                 printf("Te encierra un aura maligna... El jefe %s te está esperando\n", aux -> enemigo -> nombre);
                 printf("(Vida: %d, Daño: %d, Defensa: %d). ¿Estás listo para pelear?\n", aux -> enemigo -> vida, aux -> enemigo -> ataque, aux -> enemigo -> defensa);
@@ -246,14 +325,35 @@ int procesarTurno(Jugador *P, Escenario **S) { //Procesa el turno, retornando un
                     comenzarPelea(P, aux -> enemigo);
                 else {
                     puts("Decidiste no enfrentarte al jefe... pero la mazmorra castiga la cobardía alterando su estructura.");
-                    limpiarPiso(S);
+                    limpiarPiso(&S);
                     return 1;
                 }
                 break;
+            }
         }
     } else
         puts("Ya has vistado este escenario previamente.");
+        borrarLineas(7);
     return 2;
+}
+
+void mostrarNivel(Jugador *P, Escenario **E) {
+    for (int i = 0 ; i < 5 ; i++) {
+        for (int j = 0 ; j < 5 ; j++) {
+            if ((i == P -> posicion.posX) && (j == P -> posicion.posY))
+                printf("J ");
+            else {
+                if (E[i][j].visitado)
+                    printf("O ");
+                else
+                    printf("X ");
+                   
+            }
+        }
+        puts("");
+    }
+    puts("\nJ = Jugador, O = Visitado, X = No Visitado");
+    Sleep(500);
 }
 
 
@@ -312,22 +412,28 @@ void aprenderSkill(Jugador *P, Skill *H) { // Aprende una skill en el primer slo
 }
 
 void inventarioJugador(Jugador *P) {
-    int num;
+    int num, cont;
+    bool flag = false;
     while(1) {
         puts("Selecciona una opcion:");
         puts("1) Ver todo el inventario");
         puts("2) Ver objetos usables en combate");
         puts("3) Ver habilidades aprendidas");
         puts("4) Aprender habilidades");
-        puts("5) Salir del menu");
+        puts("5) Volver al movimiento en la mazmorra");
         verificarOpcion(&num, 5);
+        borrarLineas(7);
+        flag = false;
+        cont = 0;
         switch (num) {
-            case 1: // 1) Ver todo el inventario
+            case 1: {// 1) Ver todo el inventario
+                
                 for (Item *actual = list_first(P -> inventario); actual != NULL ; actual = list_next(P -> inventario)) { // Recorre la lista de items y los muestra todos, junto a su descripcion y stats segun sea necesario
+                    flag = true;
                     puts(actual -> nombre);
                     puts(actual -> descripcion);
                     printf("Tipo: ");
-
+                    cont += 3;
                     // Muestra que tipo es el objeto actual
                     if (actual -> tipoCons == 1) { // Libro de habilidades
                         puts("Libro de Habilidades");
@@ -345,14 +451,24 @@ void inventarioJugador(Jugador *P) {
                         }
                     }
                 }
+                if (!flag) {
+                    puts("No tienes ningun objeto en tu inventario.");
+                    cont++;
+                }
+                esperarAccion();
+                Sleep(500);
+                borrarLineas(cont + 1);
                 break;
-
+            }
             case 2: // 2) Ver objetos usables en combate (Solo tipo pocion y armaduras y armas)
                 for (Item *actual = list_first(P -> inventario); actual != NULL ; actual = list_next(P -> inventario)) { // Recorre la lista de items y los muestra todos, junto a su descripcion y stats segun sea necesario
                     if (actual -> tipoCons == tipoPocion || actual -> tipoEquip != noEquipable) {
+                        cont++;
+                        flag = true;
                         puts(actual -> nombre);
                         puts(actual -> descripcion);
                         printf("Tipo: ");
+                        cont += 3;
                         // Muestra que tipo es el objeto actual
                         if (actual -> tipoCons == tipoPocion) { // Pocion
                             puts("Pocion");
@@ -368,9 +484,15 @@ void inventarioJugador(Jugador *P) {
                         }
                     }
                 }
+                if (!flag) {
+                    puts("No tienes ningun objeto en tu inventario.");
+                    cont++;
+                }
+                esperarAccion();
+                borrarLineas(cont + 1);
                 break;
 
-            case 3: // 3) Ver habilidades aprendidas 
+            case 3: { // 3) Ver habilidades aprendidas 
                 bool flag = false;
                 for (int i = 0 ; i < 2 ; i++) { // Recorre el array de dos habilidades
                     Skill *aux = P -> habilidades[i]; // Guarda en un auxiliar la habilidad actual
@@ -379,6 +501,7 @@ void inventarioJugador(Jugador *P) {
                     printf("Nombre: %s \n", aux -> nombre); // Imprime informacion importante de la habilidad
                     printf("Enfriamiento: %d \n", aux -> cooldown);
                     printf("Tipo: ");
+                    cont += 4;
                     if (aux -> tipo) { // Dependiendo del tipo, lo muestra, junto a su informacion correspondiente
                         puts("Estado");
                         printf("Duracion: %d\n", aux -> duracion);
@@ -390,9 +513,11 @@ void inventarioJugador(Jugador *P) {
                 if (!flag) {
                     puts("No tienes ninguna habilidad aprendida.");
                 }
+                esperarAccion();
+                borrarLineas(cont + 1);
                 break;
-
-            case 4: // 4) Aprender habilidades
+            }
+            case 4: { // 4) Aprender habilidades
                 int contadorSkills;
                 Skill **array = crearArraySkills(P -> inventario, &contadorSkills); // Crea un array con todas las habilidades disponibles a partir del inventario
                 puts("Habilidades disponibles:");
@@ -413,7 +538,7 @@ void inventarioJugador(Jugador *P) {
                 }
                 free(array); // Limpia el array ya que no se va a seguir usando
                 break;
-
+            }
             case 5:
             return;
         }
@@ -447,17 +572,131 @@ void infoJugador(Jugador *P) {
     puts("=======================");
 }
 
+
+//// INTERFAZ DE TESORO
+
+void mostrarInfoItem(Item *item) {
+    if (item == NULL) {
+        printf("Item nulo.\n");
+        Sleep(500);
+        borrarLineas(2);
+        return;
+    }
+    int cont = 2;
+    printf("Has encontrado %s\n", item->nombre);
+    printf("Descripción: %s\n", item->descripcion);
+    puts("");
+    // Mostrar si es consumible
+    if (item->tipoCons == tipoPocion) {
+        printf("Tipo: Poción\n");
+        printf("Vida que recupera: %d\n", item->vidaRecuperada);
+        cont += 2;
+    }
+    else if (item->tipoCons == libroDeHabilidad && item->habilidadAprendida != NULL) {
+        printf("Tipo: Libro de Habilidad\n");
+        Skill *h = item->habilidadAprendida;
+        printf("Nombre habilidad: %s\n", h->nombre);
+        printf("Tipo: %s\n", (h->tipo == curacion ? "Curación" : "Estado"));
+        printf("Cooldown: %d turnos\n", h->cooldown);
+        cont += 4;
+        if (h->tipo == curacion) {
+            printf("Vida que cura: %d\n", h->vidaCurada);
+            cont++;
+        } else if (h->estado != NULL) {
+            printf("Estado aplicado: %s\n", 
+                h->estado->tipo == vida ? "Vida" :
+                h->estado->tipo == dano ? "Daño" :
+                h->estado->tipo == defensa ? "Defensa" : "Saltar Turno");
+            printf("Duración: %d turnos\n", h->estado->duracion);
+            printf("Operación: %s %.2f\n", 
+                h->estado->op == suma ? "Suma" : "Multiplica", 
+                h->estado->cantidad);
+            cont += 3;
+        }
+    }
+
+    // Mostrar si es equipable
+    if (item->tipoEquip == ARMA) {
+        printf("Tipo: Arma\n");
+        printf("Bono de Ataque: %d\n", item->statBonus.AtaqueBonus);
+        cont += 2;
+    }
+    else if (item->tipoEquip == ARMADURA) {
+        printf("Tipo: Armadura\n");
+        printf("Bono de Defensa: %d\n", item->statBonus.DefensaBonus);
+        cont += 2;
+    }
+    esperarAccion();
+    
+    borrarLineas(cont + 2);
+}
+
+void interfazDeTesoro(Jugador *P, Item *I) {
+    borrarLineas(5);
+    mostrarInfoItem(I);
+    list_pushBack(P -> inventario, I);
+}
+
+
 //// MAIN
 
 int main() {
-    SetConsoleOutputCP(CP_UTF8);      // Para que la consola imprima UTF-8
-    setlocale(LC_ALL, "");            // Para que printf maneje tildes y ñ
+    SetConsoleOutputCP(65001); // Consola en UTF-8
+    SetConsoleCP(CP_UTF8);
 
     init_random();
+    /*
     //elGuerrero();
     printf("Bienvenido a la aventura del Guerrero más Bravo que hayas conocido\n");
     printf("Menú Principal Beta\n");
+    printf("Elige una opción:\n1) Jugar\n 2) Cómo jugar\ 3) Salir");
+    int coso;
+    verificarOpcionConBorrado(&coso, 3);
+    switch (coso)
+    {
+    case 1:
+        limpiarPantalla();
+        printf("\n\nIngresa el nombre de tu guerrero:");
+        char *str[40];
+        fgets(str, sizeof(str), stdin);
+        limpiarSTDIN();
+        break;
     
-    // ...resto de tu código...
-    return 0;
+    default:
+        break;
+    }
+    */
+    Jugador jugadorPrueba;
+    jugadorPrueba.nombre = "Felipe";
+    jugadorPrueba.vida = 100;
+    jugadorPrueba.vidaActual = jugadorPrueba.vida;
+    jugadorPrueba.ataque = 25;
+    jugadorPrueba.defensa = 10;
+    jugadorPrueba.nivel = 1;
+    jugadorPrueba.arma = NULL;
+    jugadorPrueba.armadura = NULL;
+    jugadorPrueba.inventario = list_create();
+    jugadorPrueba.habilidades[0] = NULL;
+    jugadorPrueba.habilidades[1] = NULL;
+    jugadorPrueba.efectos = list_create();
+    jugadorPrueba.posicion.posX = 0;
+    jugadorPrueba.posicion.posY = 0;
+
+    Escenario **nivelActual = crearMatriz(&jugadorPrueba);
+    while(1) {
+        mostrarNivel(&jugadorPrueba, nivelActual);
+        movimientoMazmorra(&jugadorPrueba, nivelActual);
+        procesarTurno(&jugadorPrueba, nivelActual);
+        
+    }
+
+    return 0; 
 }
+
+//void leer_status(List *listaStatus);
+
+//void leer_skills(List *listaSkills);
+
+//void leer_items(List *listaItems);
+
+//void leer_Enemies(List *listaEnemigos);

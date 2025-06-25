@@ -4,10 +4,10 @@
 #include "tdas/map.h"
 #include "tipoDato.h"
 
-void leer_status(List *listaStatus);
+void leer_status(Map *mapaStatus);
 
-void leer_skills(List *listaSkills);
+void leer_skills(List *mapaSkills);
 
-void leer_items(List *listaItems);
+void leer_items(List *mapaItems);
 
-void leer_Enemies(List *listaEnemigos);
+void leer_Enemies(List *mapaEnemigos);

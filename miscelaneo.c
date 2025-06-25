@@ -29,17 +29,15 @@ void verificarOpcionConBorrado(int *num, int limite) {
     char str[3];
     while (1) {
         fgets(str, sizeof(str), stdin);
+        printf("\033[F");
+        printf("\033[2K");
         if (str[strlen(str) - 1] != '\n') { //Se revisa si el usuario escribio mas de 2 caracteres
             limpiarSTDIN(); // Limpiar stdin para leer correctamente el proximo input
-            printf("\033[F");
-            printf("\033[2K");
         }
         else {
             if (isdigit(str[0]) && str[1] == '\n') { //En caso de que el numero ingresado no sea valido
                 *num = str[0] - '0';
                 if (*num > 0 && *num <= limite) {
-                    printf("\033[F");
-                    printf("\033[2K");
                     break;
                 }
             }
@@ -73,4 +71,12 @@ int verificarOpcionConSalir(int *num, int limite) {
         puts("Ingresa una opcion Valida");
     }
     return 0; // No contiene palabra clave
+}
+
+
+void esperarAccion() {
+    puts("Presione enter para continuar");
+    int c;
+    while ((c = getchar()) != '\n' && c != EOF);
+    puts(""); 
 }

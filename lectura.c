@@ -2,12 +2,13 @@
 #include "tdas/list.h"
 #include "tdas/map.h"
 #include "tipoDato.h"
+#include "balance.h"
 
-void leer_status(List *listaStatus) {
+
+void leer_status(Map *mapaStatus) {
   FILE *archivo = fopen("data/Status.csv", "r");
   if (archivo == NULL) {
-    perror(
-        "Error al abrir el archivo");
+    perror("Error al abrir el archivo");
     return;
   }
 
@@ -25,23 +26,22 @@ void leer_status(List *listaStatus) {
     }
     // Asigna memoria para el ID del Status
     Actual->id = atoi(campos[0]);
-    char *efectoDeStatus = strdup(campos[1]);
-    if (strcmp(efectoDeStatus, "Vida"))
+    if (strcmp(campos[1], "Vida") == 0)
         Actual->tipo = vida;
-    else if (strcmp(efectoDeStatus, "daño"))
-        Actual->tipo = daño;
-    else if (strcmp(efectoDeStatus, "defensa"))
+    else if (strcmp(campos[1], "daño") == 0)
+        Actual->tipo = dano;
+    else if (strcmp(campos[1], "defensa") == 0)
         Actual->tipo = defensa;
-    else if (strcmp(efectoDeStatus, "saltarTurno"))
+    else if (strcmp(campos[1], "saltarTurno") == 0)
         Actual->tipo = saltarTurno;
     Actual->costeTurnos = atoi(campos[3]);
-    char *TipoOperacion = strdup(campos[4]);
-    if (strcmp(campos[4], "suma") == 0) Actual->op = 0;
-    else if (strcmp(campos[4], "mult") == 0) Actual->op = 1;
+    if (strcmp(campos[4], "suma") == 0) Actual->op = suma;
+    else if (strcmp(campos[4], "mult") == 0) Actual->op = multiplicacion;
     Actual->cantidad = atof(campos[5]);
-    // Agrega el Status a la lista
-    list_pushFront(listaStatus, Actual);
-
+    // Agrega el Status al mapa
+    int *key = malloc(sizeof(int));
+    *key = Actual->id;
+    map_insert(mapaStatus, key, Actual);
   }
   fclose(archivo); 
 }
@@ -194,7 +194,7 @@ void leer_Enemies(List *listaEnemigos, List *listaItems, List *listaSkills) {
     // Asigna memoria para el nombre del enemigo
     Actual->nombre = strdup(campos[0]);
     sscanf(campos[1], "%d;%d;%d", &Actual->vida, &Actual->ataque, &Actual->defensa);
-    asignarLootAleatorio(Actual, listaItems);
+    //asignarLootAleatorio(Actual, listaItems);
     Actual->esJefe = (strcmp(campos[3], "True") == 0) ? true : false;
     // Procesa habilidades (puede haber varias separadas por ';')
     Actual->habilidades = list_create();

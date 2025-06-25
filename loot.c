@@ -31,7 +31,7 @@ void asignarLootAleatorio(Enemy *enemigo, List *listaItems) {
         Item *item = list_get(listaItems, index);
 
         if (!itemYaEnLista(enemigo->loot, item)) { // si el item no esta en el loot, lo agrega y aumenta el contador
-            push_back(enemigo->loot, item);
+            list_pushBack(enemigo->loot, item);
             i++;
         }
 

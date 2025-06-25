@@ -45,14 +45,7 @@ void elGuerrero(){
     printf("                  ..::::..                                    ......                   \n");
 }
 
-void limpiarLineas(int lineas) {
-    for (int i = 0; i < lineas; i++) {
-        printf("\033[F"); // Cursor hacia arriba una línea
-        printf("\033[2K"); // Borra la línea completa
-    }
-}
-
-int main(){
+/*int main(){
     elGuerrero();
     printf("Bienvenido.");
     getchar();
@@ -60,4 +53,4 @@ int main(){
     printf("Wawawawawa\n");
     printf("Probando");
     return 0;
-}
+}*/
