@@ -20,4 +20,13 @@ int verificarOpcionConSalir(int *, int);
 // 0: No contiene la palabra clave "SALIR"
 // 1: Contiene la palabra clave 
 
+// Imprime texto animado con velocidad personalizada (en milisegundos por carácter)
+void printcv(int vel, const char *fmt, ...);
+
+// Imprime texto animado con velocidad fija (10 ms por carácter)
+void printb(const char *fmt, ...);
+
+// borra x cantidad de lineas de texto
+void borrarLineas(int x);
+
 #endif 

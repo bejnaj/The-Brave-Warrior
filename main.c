@@ -230,7 +230,7 @@ void movimientoMazmorra(Jugador *P, Escenario **S) { // Funcion encargada de mov
     while (flag) {
         puts("Ingresa una direccion:");
         puts("1) Arriba / 2) Abajo / 3) Izquierda / 4) Derecha / 5) Entrar al apartado de inventario");
-        verificarOpcion(&num, 5); // Obtiene y formatea la opcion elegida
+        verificarOpcionConBorrado(&num, 5); // Obtiene y formatea la opcion elegida
         borrarLineas(3);
         int tempX = P -> posicion.posX;
         int tempY = P -> posicion.posY;
@@ -320,7 +320,7 @@ int procesarTurno(Jugador *P, Escenario **S) { //Procesa el turno, retornando un
                 printf("Te encierra un aura maligna... El jefe %s te está esperando\n", aux -> enemigo -> nombre);
                 printf("(Vida: %d, Daño: %d, Defensa: %d). ¿Estás listo para pelear?\n", aux -> enemigo -> vida, aux -> enemigo -> ataque, aux -> enemigo -> defensa);
                 puts("1) Si / 2) No");
-                verificarOpcion(&num, 2);
+                verificarOpcionConBorrado(&num, 2);
                 if (num == 1)
                     comenzarPelea(P, aux -> enemigo);
                 else {
@@ -391,7 +391,7 @@ void aprenderSkill(Jugador *P, Skill *H) { // Aprende una skill en el primer slo
             printf("2) %s \n", aux[1] -> nombre);
             puts("3) Salir.\n");
             int num3;
-            verificarOpcion(&num3, 3);
+            verificarOpcionConBorrado(&num3, 3);
             switch (num3) {
                 case 1:
                     pos = 0;
@@ -421,7 +421,7 @@ void inventarioJugador(Jugador *P) {
         puts("3) Ver habilidades aprendidas");
         puts("4) Aprender habilidades");
         puts("5) Volver al movimiento en la mazmorra");
-        verificarOpcion(&num, 5);
+        verificarOpcionConBorrado(&num, 5);
         borrarLineas(7);
         flag = false;
         cont = 0;
@@ -643,54 +643,52 @@ void interfazDeTesoro(Jugador *P, Item *I) {
 int main() {
     SetConsoleOutputCP(65001); // Consola en UTF-8
     SetConsoleCP(CP_UTF8);
-
     init_random();
-    /*
-    //elGuerrero();
+
+    elGuerrero();
     printf("Bienvenido a la aventura del Guerrero más Bravo que hayas conocido\n");
     printf("Menú Principal Beta\n");
-    printf("Elige una opción:\n1) Jugar\n 2) Cómo jugar\ 3) Salir");
+    printf("Elige una opción:\n1) Jugar\n2) Cómo jugar\n3) Salir\n");
     int coso;
     verificarOpcionConBorrado(&coso, 3);
     switch (coso)
     {
-    case 1:
+    case 1:{
         limpiarPantalla();
+        Jugador player;
         printf("\n\nIngresa el nombre de tu guerrero:");
-        char *str[40];
+        char str[40];
         fgets(str, sizeof(str), stdin);
         limpiarSTDIN();
-        break;
-    
-    default:
+        strcpy(player.nombre,str);
+        player.vida = 100;
+        player.vidaActual = player.vida;
+        player.ataque = 20;
+        player.defensa = 10;
+        player.nivel = 1;
+        player.arma = NULL;
+        player.armadura = NULL;
+        player.inventario = list_create();
+        player.habilidades[0] = NULL;
+        player.habilidades[1] = NULL;
+        player.efectos = list_create();
+        player.posicion.posX = 0;
+        player.posicion.posY = 0;
+        interfazComienzo(str);
+        limpiarPantalla();
+        Escenario **nivelActual = crearMatriz(&player);
+        while(1) {
+            mostrarNivel(&player, nivelActual);
+            movimientoMazmorra(&player, nivelActual);
+            procesarTurno(&player, nivelActual);
+        }
         break;
     }
-    */
-    Jugador jugadorPrueba;
-    jugadorPrueba.nombre = "Felipe";
-    jugadorPrueba.vida = 100;
-    jugadorPrueba.vidaActual = jugadorPrueba.vida;
-    jugadorPrueba.ataque = 25;
-    jugadorPrueba.defensa = 10;
-    jugadorPrueba.nivel = 1;
-    jugadorPrueba.arma = NULL;
-    jugadorPrueba.armadura = NULL;
-    jugadorPrueba.inventario = list_create();
-    jugadorPrueba.habilidades[0] = NULL;
-    jugadorPrueba.habilidades[1] = NULL;
-    jugadorPrueba.efectos = list_create();
-    jugadorPrueba.posicion.posX = 0;
-    jugadorPrueba.posicion.posY = 0;
-
-    Escenario **nivelActual = crearMatriz(&jugadorPrueba);
-    while(1) {
-        mostrarNivel(&jugadorPrueba, nivelActual);
-        movimientoMazmorra(&jugadorPrueba, nivelActual);
-        procesarTurno(&jugadorPrueba, nivelActual);
-        
+    case 3:{
+        break;
     }
-
-    return 0; 
+    return 0;
+}
 }
 
 //void leer_status(List *listaStatus);

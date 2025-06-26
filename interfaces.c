@@ -3,6 +3,11 @@
 #include <string.h>
 #include <stdio.h>
 #include <math.h>
+#include <stdarg.h>
+#include <windows.h>
+#include "miscelaneo.h"
+#include "tipoDato.h"
+#include "tdas/extra.h"
 
 void elGuerrero(){
     printf("                                                                 .::..                 \n");
@@ -43,6 +48,17 @@ void elGuerrero(){
     printf("                 7JJJJY5PPP5^                              :JYYYYYYYJJ!                \n");
     printf("                 :^^~~^~~^^.                                .^^~^^^^:.                 \n");
     printf("                  ..::::..                                    ......                   \n");
+}
+
+void interfazComienzo(char* nombre){
+    limpiarPantalla();
+    printb("Sientes una luz en el rostro...\n");
+    Sleep(1000);
+    printb("Dice tu nombre y luego pierdes su calidez...");
+    Sleep(1500);
+    printcv(200,"%s...",nombre);
+    Sleep(2000);
+
 }
 
 /*int main(){

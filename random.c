@@ -24,8 +24,8 @@ double randomRdouble(double min, double max) {
 }
 // Devuelve un número aleatorio con variación porcentual PARA ENTEROS
 int randomVint(int base, double percent) {
-    int min = (int)round(base * (1.0 - percent / 100.0));
-    int max = (int)round(base * (1.0 + percent / 100.0));
+    int min = (int)(base * (1.0 - percent / 100.0));
+    int max = (int)(base * (1.0 + percent / 100.0));
     for(size_t i = 0; i<2; i++){
         return randomRint(min, max);
     }

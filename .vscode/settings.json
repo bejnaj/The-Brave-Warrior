@@ -8,6 +8,9 @@
         "random": "c",
         "limits": "c",
         "stdarg.h": "c",
-        "windows.h": "c"
+        "windows.h": "c",
+        "random.h": "c",
+        "combate.h": "c",
+        "miscelaneo.h": "c"
     }
 }

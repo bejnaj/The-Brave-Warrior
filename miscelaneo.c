@@ -2,6 +2,8 @@
 #include <string.h>
 #include <ctype.h>
 #include <stdlib.h>
+#include <windows.h>
+#include <stdarg.h>
 
 void limpiarSTDIN() {
     int ch;
@@ -29,18 +31,21 @@ void verificarOpcionConBorrado(int *num, int limite) {
     char str[3];
     while (1) {
         fgets(str, sizeof(str), stdin);
-        printf("\033[F");
-        printf("\033[2K");
-        if (str[strlen(str) - 1] != '\n') { //Se revisa si el usuario escribio mas de 2 caracteres
-            limpiarSTDIN(); // Limpiar stdin para leer correctamente el proximo input
+        if (str[strlen(str) - 1] != '\n') { // Se revisa si el usuario escribió más de 2 caracteres
+            limpiarSTDIN(); // Limpiar stdin para leer correctamente el próximo input
+            printf("\033[F");
+            printf("\033[2K");
         }
         else {
-            if (isdigit(str[0]) && str[1] == '\n') { //En caso de que el numero ingresado no sea valido
+            if (isdigit(str[0]) && str[1] == '\n') { // Si el número ingresado es válido
                 *num = str[0] - '0';
                 if (*num > 0 && *num <= limite) {
-                    break;
+                    break; // No borra nada si es correcto
                 }
             }
+            // Si no es válido, borra la línea
+            printf("\033[F");
+            printf("\033[2K");
         }
     }
 }
@@ -68,7 +73,8 @@ int verificarOpcionConSalir(int *num, int limite) {
                 break;
             }
         }
-        puts("Ingresa una opcion Valida");
+        printf("\033[F");
+        printf("\033[2K");
     }
     return 0; // No contiene palabra clave
 }
@@ -79,4 +85,42 @@ void esperarAccion() {
     int c;
     while ((c = getchar()) != '\n' && c != EOF);
     puts(""); 
+}
+
+void printcv(int vel,const char *fmt, ...) { //printb con velocidad "vel".
+    char buffer[512];
+    va_list args;
+    va_start(args, fmt);
+    vsnprintf(buffer, sizeof(buffer), fmt, args);
+    va_end(args);
+
+    for (int i = 0; buffer[i] != '\0'; i++) {
+        putchar(buffer[i]);
+        fflush(stdout);
+        Sleep(vel); // Tiempo de espera entre caracteres en milisegundos (ajusta a tu gusto)
+    }
+}
+
+// printb: imprime texto animado, igual que printf pero mostrando cada carácter uno a uno.
+// Recibe los mismos argumentos que printf (formato y variables), pero el texto aparece animado.
+// Puedes ajustar el tiempo de animación cambiando el valor de Sleep (en milisegundos).
+void printb(const char *fmt, ...) {
+    char buffer[512];
+    va_list args;
+    va_start(args, fmt);
+    vsnprintf(buffer, sizeof(buffer), fmt, args);
+    va_end(args);
+
+    for (int i = 0; buffer[i] != '\0'; i++) {
+        putchar(buffer[i]);
+        fflush(stdout);
+        Sleep(10); // Tiempo de espera entre caracteres en milisegundos (ajusta a tu gusto)
+    }
+}
+
+void borrarLineas(int x) {
+    for (int i = 0; i < x; i++) {
+        printf("\033[F"); // Cursor una línea arriba
+        printf("\033[2K"); // Borra la línea completa
+    }
 }

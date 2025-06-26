@@ -94,8 +94,8 @@ typedef struct {
     List *loot;
     Item *arma;
     bool esJefe;
-    List *estado;
-    List *habilidades;
+    Status *efecto;
+    Skill *habilidades[3];
 } Enemy;
 
 typedef struct {
@@ -114,7 +114,7 @@ typedef struct {
     int nivel;
     List *inventario;
     Skill *habilidades[2];
-    List *efectos;
+    Status *efecto;
     Punto posicion;
 } Jugador;
 

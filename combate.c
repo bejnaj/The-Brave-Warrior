@@ -1,27 +1,10 @@
 #include "tipoDato.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include "random.h"
 #include <stdarg.h>
 #include <windows.h>
+#include "random.h"
 #include "miscelaneo.h"
-
-// printb: imprime texto animado, igual que printf pero mostrando cada carácter uno a uno.
-// Recibe los mismos argumentos que printf (formato y variables), pero el texto aparece animado.
-// Puedes ajustar el tiempo de animación cambiando el valor de Sleep (en milisegundos).
-void printb(const char *fmt, ...) {
-    char buffer[512];
-    va_list args;
-    va_start(args, fmt);
-    vsnprintf(buffer, sizeof(buffer), fmt, args);
-    va_end(args);
-
-    for (int i = 0; buffer[i] != '\0'; i++) {
-        putchar(buffer[i]);
-        fflush(stdout);
-        Sleep(10); // Tiempo de espera entre caracteres en milisegundos (ajusta a tu gusto)
-    }
-}
 
 void printearBarras(Jugador *P, Enemy *E){
     char vidatuya[P->vida + 1],vidaenemiga[E->vida + 1]; // +1 para el carácter nulo '\0'
@@ -37,14 +20,6 @@ void printearBarras(Jugador *P, Enemy *E){
     }
     printf("Tu Vida: %s (%d/%d) Defensa: %d\n", vidatuya, P->vidaActual, P->vida, P->defensa);
     printf("Enemigo: %s (%d/%d) Defensa: %d\n\n", vidaenemiga, E->vidaActual, E->vida, E->defensa);
-}
-
-
-void borrarLineas(int x) {
-    for (int i = 0; i < x; i++) {
-        printf("\033[F"); // Cursor una línea arriba
-        printf("\033[2K"); // Borra la línea completa
-    }
 }
 
 // Calcula el daño infligido considerando la defensa del enemigo
@@ -99,7 +74,7 @@ int usarObjeto(Jugador *P) {
     }
     if (i == 0) { // Si el array quedo vacio (no habian consumibles)
         printb("No tienes items consumibles.");
-        Sleep(500);
+        Sleep(1500);
         borrarLineas(2);
         return 2;
     }
@@ -107,22 +82,23 @@ int usarObjeto(Jugador *P) {
     int num;
     printb("Elige que item usar: \n");
     Sleep(1000);
-    verificarOpcion(&num, i);
+    verificarOpcionConBorrado(&num, i);
     num -= 1;
     borrarLineas(i+1);
+
     if(arrayTemp[num] -> vidaRecuperada > 0) { // Verifica si el item curaba o restaba vida
         printb("Te has recuperado %d puntos de vida\n", arrayTemp[num] -> vidaRecuperada);
-        Sleep(500);
-        borrarLineas(2);
+        
+        borrarLineas(4);
     } else { 
         if (arrayTemp[num] -> vidaRecuperada < 0) {
             printb("Has perdido %d puntos de vida\n", abs(arrayTemp[num] -> vidaRecuperada));
-            Sleep(500);
+            
             borrarLineas(2);
         }
         else {
             printb("No ocurrio nada...\n");
-            Sleep(500);
+            
             borrarLineas(2);
         }
     }
@@ -164,6 +140,7 @@ bool intentarHuir(Jugador *P, Enemy *E){
     if(randomRint(1,100)<=probabilidad){
         printf("¡¡¡Escapas exitosamente!!!");
         Sleep(4000);
+        borrarLineas(4);
         return true;
     } else{
         borrarLineas(2);
@@ -176,24 +153,32 @@ bool intentarHuir(Jugador *P, Enemy *E){
     }
 }
 
-void Habilidad(Jugador *P, Enemy E,int h, int lanzaSkill){ //lanzaSkill es quién lanza la habilidad (enemigo = 0 | jugador = 1) 
-    //STATUS
-    char nombreEfecto[40];
-    strcpy(nombreEfecto, P->habilidades[h]->estado->nombre);  // h es la posicion de la habilidad
-    int valor = P->habilidades[h]->estado->cantidad;
-    int costeTurnos = P->habilidades[h]->estado->costeTurnos;
-    int duracionEstado = P->habilidades[h]->estado->duracion;
-    P->habilidades[h]->estado->tipo; //vida|dano|defensa|saltarTurno
-    P->habilidades[h]->estado->op; //suma|multiplicacion
-    //HABILIDADES
-    int vidaCurada = P->habilidades[h]->vidaCurada;
-    int duracion = P->habilidades[h]->duracion;
-    P->habilidades[h]->tipo;//curacion|estado
-    char nombre[40];
-    strcpy(nombre, P->habilidades[h]->nombre);
-    int hacia = P->habilidades[h]->hacia; // 1 tiMismo | 0 Enemigo
-    int cooldown = P->habilidades[h]->cooldown;
-    int cooldownActual = P->habilidades[h]->cooldownActual;
+void Habilidad(Jugador *P, Enemy *E, int h, int lanzaSkill) {
+    Skill *skill = P->habilidades[h];
+    if (!skill) return;
+
+    // Si la habilidad es de curación
+    if (skill->tipo == curacion) {
+        if (skill->hacia == 1) { // Se cura a sí mismo
+            P->vidaActual += skill->vidaCurada;
+            if (P->vidaActual > P->vida) P->vidaActual = P->vida;
+            printb("%s se ha curado %d puntos de vida.\n", P->nombre, skill->vidaCurada);
+        } else { // Cura al enemigo (poco común, pero posible)
+            E->vidaActual += skill->vidaCurada;
+            if (E->vidaActual > E->vida) E->vidaActual = E->vida;
+            printb("%s ha curado a %s %d puntos de vida.\n", P->nombre, E->nombre, skill->vidaCurada);
+        }
+    }
+    // Si la habilidad es de estado
+    else if (skill->tipo == estado) {
+        if (skill->hacia == 1) { // Aplica estado a sí mismo
+            P->efecto = skill->estado;
+            printb("%s ahora tiene el estado: %s\n", P->nombre, skill->estado->nombre);
+        } else { // Aplica estado al enemigo
+            E->efecto = skill->estado;
+            printb("%s ha aplicado el estado %s a %s\n", P->nombre, skill->estado->nombre, E->nombre);
+        }
+    }
 }
 
 void Pelear(Jugador *P, Enemy *E){ //FALTA GESTIONAR LAS HABILIDADES, SI NO HAY ENTONCES SE INHABILITAN OPCIONES 2 U 3 DEPENDIENDO DE LA CANTIDAD.
@@ -209,11 +194,10 @@ void Pelear(Jugador *P, Enemy *E){ //FALTA GESTIONAR LAS HABILIDADES, SI NO HAY 
                 P->habilidades[i]->nombre,
                 P->habilidades[i]->tipo,
                 P->habilidades[i]->cooldown);
+            contador++;
         }
-        contador++;
     }
-    if(num>contador) num=4;
-    verificarOpcionConBorrado(&num,3);
+    verificarOpcionConBorrado(&num,contador);
     switch (num)
     {
     case 1: {
@@ -222,7 +206,7 @@ void Pelear(Jugador *P, Enemy *E){ //FALTA GESTIONAR LAS HABILIDADES, SI NO HAY 
                 ataque = randomVint(Ataque(P->ataque,E->defensa,E->vida),50);
             }
         E->vidaActual -= ataque; // <-- Aplica el daño al enemigo
-        borrarLineas(7);
+        borrarLineas(8);
         printearBarras(P,E);
         printf("Es tu turno\n");
         if (ataque>(Ataque(P->ataque,E->defensa,E->vida) * 1.3)){
@@ -279,7 +263,7 @@ void comenzarPelea(Jugador *P, Enemy *E/*, Map *status*/) {
         // Turno del jugador
         printb("Es tu turno\n");
         Sleep(1000);
-        verificarOpcion(&num,3);
+        verificarOpcionConBorrado(&num,3);
         switch (num)
         {
         case 1:
@@ -339,25 +323,64 @@ void comenzarPelea(Jugador *P, Enemy *E/*, Map *status*/) {
             Sleep(1000);
             printb("GAME OVER");
             break;
+            
         }
     }
 }
 
-/*int main(){
+int main(){
     init_random();
     SetConsoleOutputCP(65001); // Consola en UTF-8
 
+    Status *statusRegeneracion = malloc(sizeof(Status));
+    statusRegeneracion->id = 2;
+    statusRegeneracion->nombre = strdup("Regeneración");
+    statusRegeneracion->tipo = vida;
+    statusRegeneracion->op = suma;
+    statusRegeneracion->cantidad = 10;
+    statusRegeneracion->costeTurnos = 0;
+    statusRegeneracion->duracion = 3;
+
+    Status *statusEnvenenado = malloc(sizeof(Status));
+    statusEnvenenado->id = 1;
+    statusEnvenenado->nombre = strdup("Envenenado");
+    statusEnvenenado->tipo = vida;
+    statusEnvenenado->op = suma;
+    statusEnvenenado->cantidad = -10;
+    statusEnvenenado->costeTurnos = 0;
+    statusEnvenenado->duracion = 3;
+
+    Skill *skillRegeneracion = malloc(sizeof(Skill));
+    skillRegeneracion->nombre = strdup("Regeneración");
+    skillRegeneracion->cooldown = 3;
+    skillRegeneracion->cooldownActual = 0;
+    skillRegeneracion->duracion = 3;
+    skillRegeneracion->tipo = estado;
+    skillRegeneracion->vidaCurada = 0;
+    skillRegeneracion->estado = statusRegeneracion;
+    skillRegeneracion->hacia = 1; // propio
+
+    Skill *skillEnvenenar = malloc(sizeof(Skill));
+    skillEnvenenar->nombre = strdup("Envenenar");
+    skillEnvenenar->cooldown = 3;
+    skillEnvenenar->cooldownActual = 0;
+    skillEnvenenar->duracion = 3;
+    skillEnvenenar->tipo = estado;
+    skillEnvenenar->vidaCurada = 0;
+    skillEnvenenar->estado = statusEnvenenado;
+    skillEnvenenar->hacia = 0; // enemigo
+
     Enemy enemigoPrueba;
     enemigoPrueba.nombre = "Orco";
-    enemigoPrueba.vida = 80;
-    enemigoPrueba.vidaActual = enemigoPrueba.vida;
-    enemigoPrueba.ataque = 15;
-    enemigoPrueba.defensa = 5;
     enemigoPrueba.arma = NULL;
+    enemigoPrueba.vida = 80 + enemigoPrueba.arma->statBonus.vidaBonus;
+    enemigoPrueba.vidaActual = enemigoPrueba.vida;
+    enemigoPrueba.ataque = 15 + enemigoPrueba.arma->statBonus.AtaqueBonus;
+    enemigoPrueba.defensa = 5 + enemigoPrueba.arma->statBonus.DefensaBonus;
     enemigoPrueba.esJefe = false;
     enemigoPrueba.loot = NULL;
-    enemigoPrueba.estado = NULL;
-    enemigoPrueba.habilidades = NULL;
+    enemigoPrueba.efecto = NULL;
+    enemigoPrueba.habilidades[0] = &skillEnvenenar;
 
     Item itemPrueba;
     itemPrueba.nombre = strdup("Completo con Chucrut");
@@ -388,22 +411,22 @@ void comenzarPelea(Jugador *P, Enemy *E/*, Map *status*/) {
 
     Jugador jugadorPrueba;
     jugadorPrueba.nombre = "Felipe";
-    jugadorPrueba.vida = 100;
-    jugadorPrueba.vidaActual = jugadorPrueba.vida;
-    jugadorPrueba.ataque = 20;
-    jugadorPrueba.defensa = 10;
-    jugadorPrueba.nivel = 1;
-    jugadorPrueba.arma = NULL;
+    jugadorPrueba.arma = &itemPrueba2;
     jugadorPrueba.armadura = NULL;
+    jugadorPrueba.vida = 100 + (jugadorPrueba.armadura->statBonus.vidaBonus) + (jugadorPrueba.arma->statBonus.vidaBonus);
+    jugadorPrueba.vidaActual = jugadorPrueba.vida;
+    jugadorPrueba.ataque = 20 + (jugadorPrueba.armadura->statBonus.AtaqueBonus) + (jugadorPrueba.arma->statBonus.AtaqueBonus);
+    jugadorPrueba.defensa = 10 +(jugadorPrueba.armadura->statBonus.DefensaBonus) + (jugadorPrueba.arma->statBonus.DefensaBonus);
+    jugadorPrueba.nivel = 1;
     jugadorPrueba.inventario = L;
-    jugadorPrueba.habilidades[0] = NULL;
-    jugadorPrueba.habilidades[1] = NULL;
-    jugadorPrueba.efectos = NULL;
+    jugadorPrueba.habilidades[0] = skillRegeneracion;
+    jugadorPrueba.habilidades[1] = NULL; // o puedes poner otra skill si quieres
+    jugadorPrueba.efecto = NULL;
     jugadorPrueba.posicion.posX = 0;
     jugadorPrueba.posicion.posY = 0;
 
     
     
-    comenzarPelea(&jugadorPrueba, &enemigoPrueba, NULL); // Llama al combate
+    comenzarPelea(&jugadorPrueba, &enemigoPrueba/*, NULL*/); // Llama al combate
 
-}*/
+}
