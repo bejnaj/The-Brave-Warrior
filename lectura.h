@@ -15,7 +15,4 @@ List *leer_skills(char *str, HashMap *mapaEstados);
 
 multiMapa *leer_items(char *str, List *listaSkills);
 
-List *leer_Enemies(char *str, List *listaSkills);
-
-// Obtiene los enemigos jefes de una lista de enemigos
-List *obtenerJefes(List *listaEnemigos);
+List *leer_Enemies(char *str, List *listaSkills, List *listaJefes);

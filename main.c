@@ -81,11 +81,17 @@ Enemy *clonarEnemigo(List *L, float mult, bool esJefe) {
     if (esJefe == false) {
         do {
             int pos = randomRint(0, list_size(L)); // Se elige una posicion random de la lista
-            actual = list_get(L, pos);
-        } while (actual -> esJefe == true);
+            actual = list_get(L, pos);         
+        } while (actual == NULL || actual->esJefe == true);
     }
+    if (actual == NULL) return NULL;
     Enemy *E = malloc(sizeof(Enemy));
-    E -> nombre = strdup(actual -> nombre); // Se clona el elemento
+    if (actual->nombre == NULL) {
+        printf("Error: enemigo sin nombre\n");
+        E->nombre = strdup("enemigoSinNombre");
+    } else {
+        E->nombre = strdup(actual->nombre);
+    }
     E -> vida = actual -> vida * mult;
     E -> vidaActual = E -> vida;
     E -> ataque = actual -> ataque * mult;
@@ -95,7 +101,10 @@ Enemy *clonarEnemigo(List *L, float mult, bool esJefe) {
     E -> esJefe = actual -> esJefe;
     E -> efecto = actual -> efecto;
     for (int i = 0 ; i < 3 ; i++) {
-        E -> habilidades[i] = copiaSkill(actual -> habilidades[i]);
+        if (actual -> habilidades[i] != NULL)
+            E -> habilidades[i] = copiaSkill(actual -> habilidades[i]);
+        else
+            E -> habilidades[i] = NULL;
     }
     return E;
 }
@@ -147,11 +156,18 @@ void lootearEnemigo(Jugador *P, Enemy *E) {
 //// CREACION DEL NIVEL
 
 Escenario **crearMatriz(multiMapa *mapaItems, List *listaEnemigos, Jugador *P, List *listaJefes, float *mult) {
-    Escenario **matriz = malloc(sizeof(Escenario *) * 5); // Se almacena memoria para cada Escenario *
+    Escenario **matriz = malloc(sizeof(Escenario *) * 5); // Se almacena memoria para los punteros a cada fila de Escenario
+    if (matriz == NULL) {
+        printf("Error al asignar memoria para la matriz de escenarios.\n");
+        exit(EXIT_FAILURE);
+    }
     for (int i = 0 ; i < 5 ; i++) { // Se recorren todos los elementos del Escenario *
-        matriz[i] = malloc(sizeof(Escenario) * 5); // Se almacena memoria para cada Escenario **
-        puts("omero");
-        Sleep(1000);
+        matriz[i] = malloc(sizeof(Escenario) * 5); // Se almacena memoria para cada fila (array de Escenario)
+        if (matriz[i] == NULL) {
+            printf("Error al asignar memoria para matriz[%d]\n", i);
+            exit(EXIT_FAILURE);
+        }
+        
         for (int j = 0 ; j < 5 ; j++) {
             matriz[i][j].tipo = randomRint(0,2);
             switch (matriz[i][j].tipo) { // Depende del tipo seleccionado
@@ -191,6 +207,8 @@ Escenario **crearMatriz(multiMapa *mapaItems, List *listaEnemigos, Jugador *P, L
     if (matriz[indX][indY].enemigo != NULL) { // Limpiar datos del enemigo previo si existia
          free(matriz[indX][indY].enemigo); 
     }
+    puts("omero");
+    Sleep(500);
     matriz[indX][indY].enemigo = clonarEnemigo(listaJefes, *mult, true);
     matriz[indX][indY].objeto = NULL;
 
@@ -720,8 +738,8 @@ void infoJugador(Jugador *P) {
 }
 
 Jugador *inicializarJugador(char *str) { // Inicializa un jugador con el nombre dado
-    Jugador *P = malloc (sizeof(Jugador)); // Inicializa una estructura Jugador y le asigna los valores preterminados
-    strcpy(P -> nombre,str);
+    Jugador *P = malloc(sizeof(Jugador)); // Inicializa una estructura Jugador y le asigna los valores preterminados
+    P -> nombre = strdup(str);
     P -> vida = 100;
     P -> statsBase.vida = 100;
     P -> statsBase.ataque = 20;
@@ -838,55 +856,58 @@ void interfazDeTesoro(Jugador *P, Item *I) {
     list_pushBack(P -> inventario, I);
 }
 
-void imprimirMapaItems(multiMapa *mapa) {
-    if (mapa == NULL || mapa->pares == NULL) {
-        printf("El mapa de items está vacío o no inicializado.\n");
+void imprimirListaEnemigos(List *enemigos) {
+    if (enemigos == NULL) {
+        printf("La lista de enemigos está vacía o no inicializada.\n");
         return;
     }
 
-    for (int i = 0; i < mapa->capacity; i++) {
-        multiPar *par = mapa->pares[i];
-        if (par == NULL || par->values == NULL)
-            continue;
+    Enemy *enemigo = (Enemy *)list_first(enemigos);
+    int num = 1;
+    
+    while (enemigo != NULL) {
+        printf("========= Enemigo %d =========\n", num++);
+        printf("Nombre: %s\n", enemigo->nombre ? enemigo->nombre : "(nombre NULL)");
+        printf("Vida: %d/%d\n", enemigo->vidaActual, enemigo->vida);
+        printf("Ataque: %d\n", enemigo->ataque);
+        printf("Defensa: %d\n", enemigo->defensa);
+        printf("Tipo: %s\n", enemigo->esJefe ? "JEFE" : "Normal");
 
-        printf("Clave de poder: %d\n", par->key);
-
-        Item *item = list_first(par->values);
-        while (item != NULL) {
-            printf("  Nombre: %s\n", item->nombre);
-            printf("  Descripción: %s\n", item->descripcion);
-
-            printf("  Tipo Consumible: ");
-            switch (item->tipoCons) {
-                case noConsumible: printf("No Consumible\n"); break;
-                case libroDeHabilidad: printf("Libro de Habilidad\n"); break;
-                case tipoPocion: printf("Poción\n"); break;
-                default: printf("Desconocido\n");
-            }
-
-            printf("  Tipo Equipable: ");
-            switch (item->tipoEquip) {
-                case noEquipable: printf("No Equipable\n"); break;
-                case ARMA: printf("Arma\n"); break;
-                case ARMADURA: printf("Armadura\n"); break;
-                default: printf("Desconocido\n");
-            }
-
-            printf("  Bonus de stats: Vida %d | Ataque %d | Defensa %d\n",
-                   item->statBonus.vida, item->statBonus.ataque, item->statBonus.defensa);
-
-            if (item->habilidadAprendida) {
-                printf("  Habilidad Aprendida: %s\n", item->habilidadAprendida->nombre);
-            } else {
-                printf("  Habilidad Aprendida: Ninguna\n");
-            }
-
-            printf("  Vida Recuperada: %d\n", item->vidaRecuperada);
-            printf("  Poder: %d\n", item->poder);
-            printf("  ----------------------------\n");
-
-            item = list_next(par->values);
+        // Loot
+        if (enemigo->loot != NULL && enemigo->loot->nombre != NULL) {
+            printf("Loot: %s\n", enemigo->loot->nombre);
+        } else {
+            printf("Loot: Ninguno\n");
         }
+
+        // Arma equipada
+        if (enemigo->arma != NULL && enemigo->arma->nombre != NULL) {
+            printf("Arma: %s\n", enemigo->arma->nombre);
+        } else {
+            printf("Arma: Ninguna\n");
+        }
+
+        // Efecto de estado
+        if (enemigo->efecto != NULL && enemigo->efecto->nombre != NULL) {
+            printf("Estado aplicado: %s (duración: %d turnos)\n",
+                   enemigo->efecto->nombre, enemigo->efecto->duracion);
+        } else {
+            printf("Estado aplicado: Ninguno\n");
+        }
+
+        // Habilidades
+        printf("Habilidades:\n");
+        for (int i = 0; i < 3; i++) {
+            if (enemigo->habilidades[i] != NULL && enemigo->habilidades[i]->nombre != NULL) {
+                printf("  - %s\n", enemigo->habilidades[i]->nombre);
+            } else {
+                printf("  - (vacío)\n");
+            }
+        }
+
+        printf("=============================\n\n");
+
+        enemigo = (Enemy *)list_next(enemigos);
     }
 }
 
@@ -899,11 +920,12 @@ int main() {
     init_random();
 
     // Proceso de lectura de datos
+    List *listaJefes = list_create();
     HashMap *mapaStatus = leer_status("data/Status.csv");
     List *listaSkills = leer_skills("data/Skills.csv", mapaStatus);
     multiMapa *mapaItems = leer_items("data/Items.csv", listaSkills);
-    List *listaEnemigos = leer_Enemies("data/Enemies.csv", listaSkills);
-    List *listaJefes = obtenerJefes(listaEnemigos);
+    List *listaEnemigos = leer_Enemies("data/Enemies.csv", listaSkills, listaJefes);
+    imprimirListaEnemigos(listaEnemigos);
     elGuerrero();
     printf("Bienvenido a la aventura del Guerrero más Bravo que hayas conocido\n");
     printf("Menú Principal Beta\n");
@@ -921,7 +943,7 @@ int main() {
             limpiarSTDIN(); 
         }
         Jugador *player = inicializarJugador(str);
-        interfazComienzo(str);
+        //interfazComienzo(str);
         limpiarPantalla();
         float mult = 1; // Controla la dificultad del piso
         Escenario **nivelActual = crearMatriz(mapaItems, listaEnemigos, player, listaJefes, &mult);

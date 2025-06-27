@@ -75,7 +75,6 @@ List *leer_skills(char *str, HashMap *mapaEstados) {
     if (par != NULL) {
         Actual->estado = (Status *)par->value;
     } else {
-        fprintf(stderr, "Advertencia: Estado con ID '%s' no encontrado.\n", campos[5]);
         Actual->estado = NULL;
     }
 
@@ -169,7 +168,7 @@ multiMapa *leer_items(char *str, List *listaSkills) {
   return mapaItems;
 }
 
-List *leer_Enemies(char *str, List *listaSkills) {
+List *leer_Enemies(char *str, List *listaSkills, List *listaJefes) {
   FILE *archivo = fopen(str, "r");
   if (archivo == NULL) {
     perror("Error al abrir el archivo");
@@ -207,18 +206,11 @@ List *leer_Enemies(char *str, List *listaSkills) {
       }
     }
     // Agrega el enemigo a la lista
-    list_pushFront(listaEnemigos, Actual);
+    if (Actual -> esJefe)
+      list_pushFront(listaJefes, Actual);
+    else
+      list_pushFront(listaEnemigos, Actual);
   }
   fclose(archivo);
   return listaEnemigos;
-}
-
-List *obtenerJefes(List *L) {
-  List *J = list_create();
-  for (Enemy *actual = list_first(L) ; actual != NULL ; actual = list_next(L)) {
-    if (actual -> esJefe) {
-      list_pushBack(J, actual);
-    }
-  }
-  return J;
 }
