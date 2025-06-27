@@ -12,19 +12,28 @@ void limpiarSTDIN() {
 }
 
 void verificarOpcion(int *num, int limite) {
-    char str[3];
+    char str[20]; // Espacio suficiente para números grandes
     while (1) {
         fgets(str, sizeof(str), stdin);
-        if (str[strlen(str) - 1] != '\n') { //Se revisa si el usuario escribio mas de 2 caracteres
-            limpiarSTDIN(); // Limpiar stdin para leer correctamente el proximo input
-        } 
-        else {
-            if (isdigit(str[0]) && str[1] == '\n') { //En caso de que el numero ingresado no sea valido
-                *num = str[0] - '0';
-                if (*num > 0 && *num <= limite) break;
+
+        // Limpiar buffer si input excede el tamaño
+        if (str[strlen(str) - 1] != '\n') {
+            limpiarSTDIN(); 
+        }
+
+        // Intentar convertir a número
+        char *endptr;
+        long val = strtol(str, &endptr, 10);
+
+        // Verifica si se convirtió correctamente y no hay caracteres extra
+        if (endptr != str && *endptr == '\n') {
+            if (val > 0 && val <= limite) {
+                *num = (int)val;
+                break;
             }
         }
-        puts("Ingresa una opcion Valida");
+
+        puts("Ingresa una opción válida");
     }
 }
 
@@ -51,33 +60,44 @@ void verificarOpcionConBorrado(int *num, int limite) {
     }
 }
     
-
 int verificarOpcionConSalir(int *num, int limite) {
     // return
     // 0: No contiene la palabra clave "SALIR"
     // 1: Contiene la palabra clave 
-    char str[7];
+     char str[30]; // Espacio suficiente para entrada
     while (1) {
         fgets(str, sizeof(str), stdin);
 
-        if (str[strlen(str) - 1] != '\n') { //Se revisa si el usuario escribio mas de 2 caracteres
-            limpiarSTDIN(); // Limpiar stdin para leer correctamente el proximo input
+        // Limpiar buffer si input excede el tamaño
+        if (str[strlen(str) - 1] != '\n') {
+            limpiarSTDIN();
         }
-        str[strcspn(str, "\n")] = '\0'; // Quita el salto de linea
 
-        if (strcmp(str, "SALIR") == 0) return 1; // Contiene palabra clave
-    
-         // Verificar si es un número válido
-        if (strlen(str) == 1 && isdigit(str[0])) {
-            *num = str[0] - '0';
-            if (*num > 0 && *num <= limite) {
-                break;
+        // Eliminar salto de línea al final
+        str[strcspn(str, "\n")] = '\0';
+
+        // Convertir a mayúsculas para comparar con "SALIR"
+        char upperStr[30];
+        for (int i = 0; str[i] && i < 29; i++)
+            upperStr[i] = toupper((unsigned char)str[i]);
+        upperStr[strlen(str)] = '\0';
+
+        if (strcmp(upperStr, "SALIR") == 0) {
+            return 1; // Contenia palabra clave
+        }
+
+        // Intentar convertir a número
+        char *endptr;
+        long val = strtol(str, &endptr, 10);
+        if (endptr != str && *endptr == '\0') {
+            if (val > 0 && val <= limite) {
+                *num = (int)val;
+                return 0; // Entrada numérica válida
             }
         }
-        printf("\033[F");
-        printf("\033[2K");
+
+        puts("Ingresa un número válido o escribe 'SALIR' para salir.");
     }
-    return 0; // No contiene palabra clave
 }
 
 

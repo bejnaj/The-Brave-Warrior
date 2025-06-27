@@ -123,9 +123,9 @@ multiMapa *leer_items(List *listaItems, List *listaSkills) {
     int vida = 0, ataque = 0, defensa = 0;
     
     sscanf(campos[3], "%d;%d;%d", &vida, &ataque, &defensa);
-    Actual->statBonus.vidaBonus = vida;
-    Actual->statBonus.AtaqueBonus = ataque;
-    Actual->statBonus.DefensaBonus = defensa;
+    Actual->statBonus.vida = vida;
+    Actual->statBonus.ataque = ataque;
+    Actual->statBonus.defensa = defensa;
 
     // Asigna la vida recuperada por el item
     Actual->vidaRecuperada = atoi(campos[4]);
