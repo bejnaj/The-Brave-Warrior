@@ -1,6 +1,6 @@
 #ifndef MISCELANEO_H
 #define MISCELANEO_H
-
+#include "tipoDato.h"
 
 // Limpia el STDIN para asegurar el correcto funcionamiento de funciones que dependan de este (por ejemplo, fgets)
 void limpiarSTDIN(); 
@@ -30,13 +30,7 @@ void printb(const char *fmt, ...);
 Skill *copiaSkill(Skill *elem);
 
 // Para comparar una skill y un nombre de skill (char *)
-int cmpSkill(Skill *a, char *b);
-
-// Para comparar un status y un nombre de status (char *)
-int cmpID(Status *a, char *b);
-
-// Compara dos Items
-int estadoEqual(Status *k1, Status *k2);
+int cmpSkill(void *a, void *b);
 
 // borra x cantidad de lineas de texto
 void borrarLineas(int x);

@@ -1,17 +1,21 @@
 #include "tipoDato.h"
 #include <math.h>
 
-int powerIndex(Item *I) { // Obtiene el poder bruto de un arma
+int powerIndexItems(Item *I) {
     if (I -> tipoEquip != noEquipable) {
         int poderBruto, vidaDefensa, ataque;
-        vidaDefensa = I -> statBonus.DefensaBonus; 
-        vidaDefensa += I -> statBonus.vidaBonus;
-        ataque = I -> statBonus.AtaqueBonus;
+        vidaDefensa = I -> statBonus.defensa; 
+        vidaDefensa += I -> statBonus.vida;
+        ataque = I -> statBonus.ataque;
         
         poderBruto = vidaDefensa + ataque * 2;
         return poderBruto;
     }
     else return 1;
+}
+
+ int powerIndexPlayer(Jugador *P) { 
+    return (P -> nivel) * 5.63;
 }
 
 int hash(int clave, int indiceMAX) {
@@ -20,7 +24,7 @@ int hash(int clave, int indiceMAX) {
     double norm = (double)clave / 90.0;          
     double escala = pow(norm,2);             // Escalado cuadrático
     int valor = (int)(escala * (indiceMAX - 1));  // Llevar al rango [0, indiceMAX-1]
-    
+    if (valor > 90) valor = 90;
     return valor;
 }
 

@@ -16,6 +16,9 @@
         "tipodato.h": "c",
         "lectura.h": "c",
         "map.h": "c",
-        "cstdlib": "c"
+        "stdbool.h": "c",
+        "multimapaitems.h": "c",
+        "hashmap.h": "c",
+        "balance.h": "c"
     }
 }

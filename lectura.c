@@ -1,12 +1,12 @@
 #include "lectura.h"
 
-Map *leer_status() {
-  FILE *archivo = fopen("data/Status.csv", "r");
+HashMap *leer_status(char *str) {
+  FILE *archivo = fopen(str, "r");
   if (archivo == NULL) {
     perror("Error al abrir el archivo");
-    return;
+    return NULL;
   }
-  Map *mapaStatus = map_create(estadoEqual);
+  HashMap *mapaStatus = createMap(50);
   // lee los nombres de cada columna
   char **campos;
   campos = leer_linea_csv(archivo, ',');
@@ -19,34 +19,34 @@ Map *leer_status() {
         perror("Error al asignar memoria para el escenario");
         continue;
     }
-    // Asigna memoria para el ID del Status
-    Actual->id = atoi(campos[0]);
-    if (strcmp(campos[1], "Vida") == 0)
+    // Asigna memoria para el nombre del Status
+    Actual -> nombre = strdup(campos[1]);
+
+    if (strcmp(campos[2], "Vida") == 0)
         Actual->tipo = vida;
-    else if (strcmp(campos[1], "daño") == 0)
+    else if (strcmp(campos[2], "daño") == 0)
         Actual->tipo = dano;
-    else if (strcmp(campos[1], "defensa") == 0)
+    else if (strcmp(campos[2], "defensa") == 0)
         Actual->tipo = defensa;
-    else if (strcmp(campos[1], "saltarTurno") == 0)
+    else if (strcmp(campos[2], "saltarTurno") == 0)
         Actual->tipo = saltarTurno;
     Actual->costeTurnos = atoi(campos[3]);
     if (strcmp(campos[4], "suma") == 0) Actual->op = suma;
     else if (strcmp(campos[4], "mult") == 0) Actual->op = multiplicacion;
     Actual->cantidad = atof(campos[5]);
     // Agrega el Status al mapa
-    int *key = malloc(sizeof(int));
-    *key = Actual->id;
-    map_insert(mapaStatus, key, Actual);
+    char *key = strdup(campos[0]);
+    insertMap(mapaStatus, key, Actual);
   }
-  fclose(archivo); 
+  fclose(archivo);
+  return mapaStatus;
 }
 
-List *leer_skills(List *listaStatus) {
-  FILE *archivo = fopen("data/Skills.csv", "r");
+List *leer_skills(char *str, HashMap *mapaEstados) {
+  FILE *archivo = fopen(str, "r");
   if (archivo == NULL) {
-    perror(
-        "Error al abrir el archivo");
-    return;
+    perror("Error al abrir el archivo");
+    return NULL;
   }
   List *listaSkills = list_create();
 
@@ -70,10 +70,8 @@ List *leer_skills(List *listaStatus) {
     if (strcmp(campos[3], "curacion") == 0) Actual->tipo = curacion;
     else if (strcmp(campos[3], "estado") == 0) Actual->tipo = estado;
     Actual->vidaCurada = atoi(campos[4]);
-    Status *estado = NULL;
     if (strcmp(campos[5], "NULL") != 0) {
-        int idEstado = atoi(campos[5]);
-        Status *estado = (Status *)list_find(listaStatus, &idEstado, cmpID);
+        Status *estado = (Status *)searchMap(mapaEstados, campos[5]) -> value;
         Actual->estado = estado;
     } else {
         Actual->estado = NULL;
@@ -82,14 +80,15 @@ List *leer_skills(List *listaStatus) {
     // Agrega la habilidad a la lista
     list_pushFront(listaSkills, Actual);
   }
-  fclose(archivo); 
+  fclose(archivo);
+  return listaSkills;
 }
 
-multiMapa *leer_items(List *listaItems, List *listaSkills) {
-  FILE *archivo = fopen("data/Items.csv", "r");
+multiMapa *leer_items(char *str, List *listaSkills) {
+  FILE *archivo = fopen(str, "r");
   if (archivo == NULL) {
     perror("Error al abrir el archivo");
-    return;
+    return NULL;
   }
 
 
@@ -123,9 +122,9 @@ multiMapa *leer_items(List *listaItems, List *listaSkills) {
     int vida = 0, ataque = 0, defensa = 0;
     
     sscanf(campos[3], "%d;%d;%d", &vida, &ataque, &defensa);
-    Actual->statBonus.vidaBonus = vida;
-    Actual->statBonus.AtaqueBonus = ataque;
-    Actual->statBonus.DefensaBonus = defensa;
+    Actual->statBonus.vida = vida;
+    Actual->statBonus.ataque = ataque;
+    Actual->statBonus.defensa = defensa;
 
     // Asigna la vida recuperada por el item
     Actual->vidaRecuperada = atoi(campos[4]);
@@ -155,7 +154,7 @@ multiMapa *leer_items(List *listaItems, List *listaSkills) {
         Actual->descripcion = strdup(campos[6]);
     }
     // Calcula el poder del item
-    Actual -> poder = powerIndex(Actual);
+    Actual -> poder = powerIndexItems(Actual);
 
     // Agrega el item al mapa
     insertarMultiMapa(mapaItems, Actual -> poder, Actual);
@@ -164,11 +163,11 @@ multiMapa *leer_items(List *listaItems, List *listaSkills) {
   return mapaItems;
 }
 
-List *leer_Enemies(List *listaItems, List *listaSkills) {
-  FILE *archivo = fopen("data/Enemies.csv", "r");
+List *leer_Enemies(char *str, List *listaSkills) {
+  FILE *archivo = fopen(str, "r");
   if (archivo == NULL) {
     perror("Error al abrir el archivo");
-    return;
+    return NULL;
   }
   List *listaEnemigos = list_create(); // Crea la lista de enemigos
 
@@ -188,7 +187,7 @@ List *leer_Enemies(List *listaItems, List *listaSkills) {
     // Asigna memoria para el nombre del enemigo
     Actual->nombre = strdup(campos[0]);
     sscanf(campos[1], "%d;%d;%d", &Actual->vida, &Actual->ataque, &Actual->defensa);
-    //asignarLootAleatorio(Actual, listaItems);
+
     Actual->esJefe = (strcmp(campos[3], "True") == 0) ? true : false;
     // Procesa habilidades (puede haber hasta 3 separadas por ';')
     if (strcmp(campos[4], "NULL") != 0) {
@@ -196,7 +195,7 @@ List *leer_Enemies(List *listaItems, List *listaSkills) {
       int i = 0;
       for (char *subcampoActual = list_first(L) ; subcampoActual != NULL && i < 3 ; subcampoActual = list_first(L)) { // parsea y copia cada habilidad
         Skill *aux = (Skill *)list_find(listaSkills, subcampoActual, cmpSkill);
-        Actual -> habilidades[i] = copiaSkill(aux);
+        Actual -> habilidades[i] = aux;
         free(list_popFront(L));
         i++;
       }
@@ -206,4 +205,14 @@ List *leer_Enemies(List *listaItems, List *listaSkills) {
   }
   fclose(archivo);
   return listaEnemigos;
+}
+
+List *obtenerJefes(List *L) {
+  List *J = list_create();
+  for (Enemy *actual = list_first(L) ; actual != NULL ; actual = list_next(L)) {
+    if (actual -> esJefe) {
+      list_pushBack(J, actual);
+    }
+  }
+  return J;
 }

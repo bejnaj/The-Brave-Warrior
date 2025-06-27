@@ -1,6 +1,6 @@
 #include "tdas/extra.h"
 #include "tdas/list.h"
-#include "tdas/map.h"
+#include "tdas/hashmap.h"
 #include "tipoDato.h"
 #include "tdas/multimapaItems.h"
 #include "balance.h"
@@ -9,10 +9,13 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
-Map *leer_status();
+HashMap *leer_status(char *str);
 
-List *leer_skills();
+List *leer_skills(char *str, HashMap *mapaEstados);
 
-multiMapa *leer_items(List *listaItems, List *listaSkills);
+multiMapa *leer_items(char *str, List *listaSkills);
 
-List *leer_Enemies(List *listaItems, List *listaSkills);
+List *leer_Enemies(char *str, List *listaSkills);
+
+// Obtiene los enemigos jefes de una lista de enemigos
+List *obtenerJefes(List *listaEnemigos);

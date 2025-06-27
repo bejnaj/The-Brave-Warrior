@@ -212,7 +212,11 @@ void *list_get(List *lista, int index) {
     for (int i = 0; i < index && nodo; i++)
         nodo = nodo->next;
 
-    return nodo ? nodo->data : NULL;
+    if (nodo) {
+        lista->current = nodo; 
+        return nodo->data;
+    }
+    return NULL;
 }
 
 // Busca un dato en la lista usando una función de comparación. Devuelve el puntero al dato si lo encuentra, NULL si no.

@@ -50,7 +50,6 @@ typedef struct {
 } Stats;
 
 typedef struct {
-    int id;
     char *nombre;
     tipoStatus tipo;
     operacion op;
@@ -87,7 +86,7 @@ typedef struct {
     int vidaActual;
     int ataque;
     int defensa;
-    List *loot;
+    Item *loot;
     Item *arma;
     bool esJefe;
     Status *efecto;
@@ -107,6 +106,7 @@ typedef struct {
     Item *armadura;
     int ataque;
     int defensa;
+    Stats statsBase;
     int nivel;
     int xp;
     List *inventario;

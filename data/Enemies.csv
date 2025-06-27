@@ -27,7 +27,7 @@ Zombie,40;25;0,NULL,False,Debilitar
 Zombie con Casco,90;25;0,NULL,False,Debilitar
 Gigante,300;5;5,NULL,False,Blindaje
 Gigante Noble,350;10;10,NULL,False,Blindaje
-Completo Italiano,100;0;5,Mostaza,False,Enfurecer
+Completo Italiano,100;0;5,NULL,False,Enfurecer
 Pollo,20;5;0,NULL,false,NULL
 Enjambre de Moscas,50;15;0,NULL,false,NULL
 Jinete Avícola,50;30;10,NULL,false,NULL
