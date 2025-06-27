@@ -18,7 +18,7 @@ int powerIndexItems(Item *I) {
     return (P -> nivel) * 5.63;
 }
 
-int hash(int clave, int indiceMAX) {
+int multiHash(int clave, int indiceMAX) {
     if (clave <= 0) return 0;
 
     double norm = (double)clave / 90.0;          

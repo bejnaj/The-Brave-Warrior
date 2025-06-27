@@ -50,6 +50,7 @@ typedef struct {
 } Stats;
 
 typedef struct {
+    int id;
     char *nombre;
     tipoStatus tipo;
     operacion op;

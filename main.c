@@ -890,6 +890,62 @@ void interfazDeTesoro(Jugador *P, Item *I) {
     list_pushBack(P -> inventario, I);
 }
 
+void imprimirListaSkills(List *lista) {
+    if (lista == NULL) {
+        printf("La lista de habilidades está vacía o no fue inicializada.\n");
+        return;
+    }
+
+    Skill *s = list_first(lista);
+    while (s != NULL) {
+        printf("Nombre: %s\n", s->nombre);
+        printf("  Cooldown: %d\n", s->cooldown);
+        printf("  Cooldown actual: %d\n", s->cooldownActual);
+        printf("  Duración: %d\n", s->duracion);
+
+        printf("  Tipo: ");
+        switch (s->tipo) {
+            case curacion: printf("Curación\n"); break;
+            case estado: printf("Estado\n"); break;
+            default: printf("Desconocido\n"); break;
+        }
+
+        printf("  Vida curada: %d\n", s->vidaCurada);
+
+        if (s->estado != NULL) {
+            printf("  Estado aplicado:\n");
+            printf("    ID: %d\n", s->estado->id);
+            printf("    Nombre: %s\n", s->estado->nombre);
+            printf("    Tipo: ");
+            switch (s->estado->tipo) {
+                case vida: printf("Vida\n"); break;
+                case dano: printf("Daño\n"); break;
+                case defensa: printf("Defensa\n"); break;
+                case saltarTurno: printf("Saltar Turno\n"); break;
+                default: printf("Desconocido\n"); break;
+            }
+
+            printf("    Operación: ");
+            switch (s->estado->op) {
+                case suma: printf("Suma\n"); break;
+                case multiplicacion: printf("Multiplicación\n"); break;
+                default: printf("Desconocida\n"); break;
+            }
+
+            printf("    Cantidad: %.2f\n", s->estado->cantidad);
+            printf("    Coste de Turnos: %d\n", s->estado->costeTurnos);
+            printf("    Duración: %d\n", s->estado->duracion);
+        } else {
+            printf("  Estado aplicado: Ninguno\n");
+        }
+
+        printf("  Hacia: %s\n", s->hacia ? "Enemigo" : "Jugador");
+        printf("-------------------------\n");
+
+        s = list_next(lista);
+    }
+}
+
 
 //// MAIN
 
@@ -904,7 +960,7 @@ int main() {
     multiMapa *mapaItems = leer_items("data/Items.csv", listaSkills);
     List *listaEnemigos = leer_Enemies("data/Enemies.csv", listaSkills);
     List *listaJefes = obtenerJefes(listaEnemigos);
-
+    imprimirListaSkills(listaSkills);
     elGuerrero();
     printf("Bienvenido a la aventura del Guerrero más Bravo que hayas conocido\n");
     printf("Menú Principal Beta\n");

@@ -17,7 +17,7 @@ multiPar *crearMultiPar(int key, void * value) {
 
 
 void insertarMultiMapa(multiMapa *map, int key, void *value) { // Usando poder del item como key
-    int keyHash = hash(key, map -> capacity);
+    int keyHash = multiHash(key, map -> capacity);
     if (map -> pares[keyHash] == NULL || map -> pares[keyHash] -> values == NULL) { // Si no existe
         map -> pares[keyHash] = crearMultiPar(keyHash, value);
         map -> current = keyHash;
@@ -60,7 +60,7 @@ multiMapa *crearMultiMapa(long capacity) {
 }
 
 multiPar *buscarMultiMapa(multiMapa *map, int key) {  
-    int pos = hash(key, map -> capacity);
+    int pos = multiHash(key, map -> capacity);
     multiPar *par = map->pares[pos];
 
     if (par != NULL && (par -> key == key)) {

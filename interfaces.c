@@ -60,13 +60,3 @@ void interfazComienzo(char* nombre){
     Sleep(2000);
 
 }
-
-/*int main(){
-    elGuerrero();
-    printf("Bienvenido.");
-    getchar();
-    limpiarLineas(50);
-    printf("Wawawawawa\n");
-    printf("Probando");
-    return 0;
-}*/

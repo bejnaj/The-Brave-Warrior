@@ -20,9 +20,10 @@ HashMap *leer_status(char *str) {
         continue;
     }
     // Asigna memoria para el nombre del Status
+    Actual -> id = atoi(campos[0]);
     Actual -> nombre = strdup(campos[1]);
-
-    if (strcmp(campos[2], "Vida") == 0)
+    Actual -> duracion = 0;
+    if (strcmp(campos[2], "vida") == 0)
         Actual->tipo = vida;
     else if (strcmp(campos[2], "daño") == 0)
         Actual->tipo = dano;
@@ -49,7 +50,6 @@ List *leer_skills(char *str, HashMap *mapaEstados) {
     return NULL;
   }
   List *listaSkills = list_create();
-
   // lee los nombres de cada columna
   char **campos;
   campos = leer_linea_csv(archivo, ',');
@@ -71,8 +71,14 @@ List *leer_skills(char *str, HashMap *mapaEstados) {
     else if (strcmp(campos[3], "estado") == 0) Actual->tipo = estado;
     Actual->vidaCurada = atoi(campos[4]);
     if (strcmp(campos[5], "NULL") != 0) {
-        Status *estado = (Status *)searchMap(mapaEstados, campos[5]) -> value;
-        Actual->estado = estado;
+    Pair *par = searchMap(mapaEstados, campos[5]);
+    if (par != NULL) {
+        Actual->estado = (Status *)par->value;
+    } else {
+        fprintf(stderr, "Advertencia: Estado con ID '%s' no encontrado.\n", campos[5]);
+        Actual->estado = NULL;
+    }
+
     } else {
         Actual->estado = NULL;
     }
