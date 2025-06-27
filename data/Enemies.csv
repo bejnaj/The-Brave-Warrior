@@ -1,7 +1,7 @@
 nombre,{vida;ataque;defensa},loot,esJefe(bool),habilidades
 Goblin,50;10;5,NULL,False,Envenenar
 Goblin Guerrero,70;15;8,NULL,False,Herida Grave
-Goblin Chamán,60;8;4,NULL,False,Regeneración
+Goblin Enfermera,60;8;4,NULL,False,Regeneración
 Rey Goblin,300;10;0,NULL,True,Envenenar;Herida Grave;Regeneración
 Orco,120;25;15,NULL,False,Enfurecer
 Orco Bruto,160;35;20,NULL,False,Aturdir
@@ -17,23 +17,29 @@ Rey Slime,200;25;10,NULL,True,Envenenar;Aturdir
 Bandido,80;20;8,NULL,False,Herida Grave
 Bandido Líder,140;30;12,NULL,False,Herida Grave
 Murciélago,30;7;2,NULL,False,Desangrar
+Dragon pequeño sin alas ni piernas,100;20;10,NULL,False,Desangrar
 Murciélago Vampiro,80;18;6,NULL,False,Curación Menor
+Creeper,90;15;5,NULL,False,Explotar
 Drácula,220;35;18,NULL,True,Desangrar;Curación Mayor;Congelar
+Alucard hijo de Drácula,500;50;25,NULL,True,Curación Mayor;Congelar;Maldecir
 Lobo,70;16;7,NULL,False,Desangrar
 Lobo Alfa,150;28;14,NULL,False,Desangrar
-Wizard,90;22;8,NULL,False,Maldecir
-Super Wizard,200;35;15,NULL,True,Maldecir;Bola de Fuego;Recuperación Rápida
+Mago Oscuro,90;22;8,NULL,False,Maldecir
+Mago Maestro,200;35;15,NULL,True,Maldecir;Bola de Fuego;Recuperación Rápida
 Zombie,40;25;0,NULL,False,Debilitar
 Zombie con Casco,90;25;0,NULL,False,Debilitar
+Gargantuar,220;30;10,NULL,True,Blindaje;Dessangrar;Debilitar
 Gigante,300;5;5,NULL,False,Blindaje
 Gigante Noble,350;10;10,NULL,False,Blindaje
-Completo Italiano,100;0;5,NULL,False,Enfurecer
-Pollo,20;5;0,NULL,false,NULL
-Enjambre de Moscas,50;15;0,NULL,false,NULL
-Jinete Avícola,50;30;10,NULL,false,NULL
-Ratón sin cola,20;10;0,NULL,false,NULL
-Ratón con cola,25;10;0,NULL,false,NULL
-Poro,30;5;0,NULL,false,NULL
-Vampiro,150;20;0,NULL,false,NULL
-Completo con piernas,15;50;0,NULL,false,NULL
-Piñera Robot 3000,1000;30;10,NULL,true,Puchas;Recorcholis;Recrestas
+Completo Italiano (De italia),100;0;5,NULL,False,Enfurecer
+Pollo con problemas de ira,20;5;0,NULL,False,NULL
+LA mosca,1;2;0,NULL,False,NULL
+Enjambre de Moscas,50;15;0,NULL,False,NULL
+Jinete Avícola,50;30;10,NULL,False,NULL
+Ratón sin cola,20;10;0,NULL,False,NULL
+Ratón con cola,25;10;0,NULL,False,NULL
+Poro,30;5;0,NULL,False,NULL
+Vampiro,150;20;0,NULL,False,NULL
+Completo con piernas,15;50;0,NULL,False,NULL
+Piñera Robot 3000,1000;30;10,NULL,True,Puchas;Recorcholis;Recrestas
+Deidad Sin Nombre (ese es su nombre),10000;100;10,NULL,True,Explotar;Bendición;Maldecir;Blindaje;Escudo de Energía;Inspirar;Desmoralizar;Fuerza Potenciada;Debilitar;Defensa de Hierro;Romper Defensa;Recuperación Rápida;Desangrar;Confundir;Somnolencia;Enfurecer;Protección Divina;Dureza de Piel
