@@ -67,6 +67,7 @@ multiPar *buscarMultiMapa(multiMapa *map, int key) {
         map -> current = pos;
         return par;
     }
+    map -> current = pos;
     return NULL;
 }
 
@@ -90,6 +91,19 @@ multiPar *siguienteMultiMapa(multiMapa *map) {
             return map -> pares[pos];
         }
         pos++;
+    }
+    return NULL;
+}
+
+multiPar *anteriorMultiMapa(multiMapa *map) {
+    if (map -> current == -1) return NULL;
+    int pos = (map -> current) - 1; 
+    while (pos >= 0) {
+        if (map -> pares[pos] != NULL) {
+            map -> current = pos;
+            return map -> pares[pos];
+        }
+        pos--;
     }
     return NULL;
 }

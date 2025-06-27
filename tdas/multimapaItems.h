@@ -17,7 +17,7 @@ struct multiMapa {
     long current; //indice del ultimo dato accedido
 };
 
-multiPar *crearMultiPar(int key, int value);
+multiPar *crearMultiPar(int key, void *value);
 
 multiMapa *crearMultiMapa(long capacity);
 
@@ -32,6 +32,8 @@ multiPar *buscarMultiMapa(multiMapa * table, int key);
 multiPar *primerElemMultiMapa(multiMapa * table);
 
 multiPar *siguienteMultiMapa(multiMapa * table);
+
+multiPar *anteriorMultiMapa(multiMapa *map);
 
 void agrandarMapa(multiMapa * map);
 

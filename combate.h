@@ -29,6 +29,6 @@ bool intentarHuir(Jugador *P, Enemy *E);
 void Pelear(Jugador *P, Enemy *E);
 
 // Inicia el combate entre el jugador y el enemigo.
-void comenzarPelea(Jugador *P, Enemy *E);
+int comenzarPelea(Jugador *P, Enemy *E);
 
 #endif // COMBATE_H

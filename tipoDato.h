@@ -87,7 +87,7 @@ typedef struct {
     int vidaActual;
     int ataque;
     int defensa;
-    List *loot;
+    Item *loot;
     Item *arma;
     bool esJefe;
     Status *efecto;

@@ -155,7 +155,7 @@ multiMapa *leer_items(List *listaItems, List *listaSkills) {
         Actual->descripcion = strdup(campos[6]);
     }
     // Calcula el poder del item
-    Actual -> poder = powerIndex(Actual);
+    Actual -> poder = powerIndexItems(Actual);
 
     // Agrega el item al mapa
     insertarMultiMapa(mapaItems, Actual -> poder, Actual);
@@ -188,7 +188,7 @@ List *leer_Enemies(List *listaItems, List *listaSkills) {
     // Asigna memoria para el nombre del enemigo
     Actual->nombre = strdup(campos[0]);
     sscanf(campos[1], "%d;%d;%d", &Actual->vida, &Actual->ataque, &Actual->defensa);
-    //asignarLootAleatorio(Actual, listaItems);
+
     Actual->esJefe = (strcmp(campos[3], "True") == 0) ? true : false;
     // Procesa habilidades (puede haber hasta 3 separadas por ';')
     if (strcmp(campos[4], "NULL") != 0) {
@@ -196,7 +196,7 @@ List *leer_Enemies(List *listaItems, List *listaSkills) {
       int i = 0;
       for (char *subcampoActual = list_first(L) ; subcampoActual != NULL && i < 3 ; subcampoActual = list_first(L)) { // parsea y copia cada habilidad
         Skill *aux = (Skill *)list_find(listaSkills, subcampoActual, cmpSkill);
-        Actual -> habilidades[i] = copiaSkill(aux);
+        Actual -> habilidades[i] = aux;
         free(list_popFront(L));
         i++;
       }

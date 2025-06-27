@@ -5,7 +5,7 @@
 #include <locale.h>
 #include "tdas/list.h"
 #include "tdas/extra.h"
-#include "tdas/map.h"
+#include "tdas/multimapaItems.h"
 #include "tipoDato.h"
 #include "random.h"
 #include "interfaces.h"
@@ -14,8 +14,22 @@
 
 //// PROTOTIPO DE FUNCIONES
 
+//// CLONADO
+
+// Clona un enemigo aleatorio de una lista y le asigna el multiplicador correspondiente
+Enemy *clonarEnemigo(List *L, int mult);
+
+// Obtiene un item aleatorio del mapa de items
+Item *obtenerItem(mapaItems, P);
+
+//// LOOT
+
+// asigna loot aleatorio a un enemigo segun la lista de items
+void asignarLootAleatorio(Jugador *P, Enemy *enemigo, multiMapa *mapaItems);
+
 // CREACION DEL NIVEL
-Escenario **crearMatriz(Map *, List *, Jugador *, List *, float *mult); // Crea la matriz 5x5 de Escenario que representara al nivel actual junto a sus parametros predeterminados, ademas de establecer una nueva posicion aleatoria del jugador.
+Escenario **crearMatriz(multiMapa *, List *, Jugador *, List *, float *mult); // Crea la matriz 5x5 de Escenario que representara al nivel actual junto a sus parametros predeterminados, ademas de establecer una nueva posicion aleatoria del jugador.
+
 
 // FUNCIONES DE LIMPIEZA
 void limpiarListaEstado(List *L); // Limpia los elementos y nodos de una listas de estados
@@ -23,6 +37,7 @@ void limpiarListaHabilidades(List *L); // Limpia los elementos y nodos de una li
 void limpiarEnemigo(Enemy *E); // Limpia los elementos de un enemigo
 void borrarLibro(List *L, char *str); // Borra la primera ocurrencia de un libro en una lista
 void limpiarPiso(Escenario ***S); // Obtiene un puntero a una matriz de Escenario (Escenario ***), limpia todos sus elementos (Escenario contiene punteros y datos estaticos, por lo que no es necesario limpiar mas adentro) y luego marca el dato como NULL
+
 
 //// MOVIMIENTO EN LA MAZMORRA
 void movimientoMazmorra(Jugador *P, Escenario **S); // Funcion encargada de mover al jugador en la direccion deseada
@@ -32,6 +47,7 @@ int procesarTurno(Jugador *P, Escenario **S, float *mult); // Procesa el turno, 
 // 1: Avanzar piso
 // 2: No hacer nada
 void mostrarNivel(Jugador *P, Escenario **S); // Muestra el estado del nivel actual
+
 
 // RELACIONADAS A JUGADOR
 Skill **crearArraySkills(List *, int *); // Crea un array que contenga las skills que se pueden aprender (usando los libros del inventario)
@@ -48,6 +64,7 @@ void levelUp(Jugador *P); // aplica las mejoras al jugador
 
 //// INTERFAZ DE TESORO
 void interfazDeTesoro(Jugador *, Item *);
+
 
 //// PARA TESTEO
 
@@ -99,10 +116,67 @@ Enemy *crearJefePrueba() {
     return E;
 } 
 
+//// CLONADO
+
+Enemy *clonarEnemigo(List *L, int mult) {
+    int pos = randomRint(1, list_size(L)); // Se elige una posicion random de la lista
+    Enemy *actual = list_get(L, pos);
+    Enemy *E = malloc(sizeof(Enemy));
+    E -> nombre = strdup(actual -> nombre); // Se clona el elemento
+    E -> vida = actual -> vida * mult;
+    E -> vidaActual = actual -> vidaActual * mult;
+    E -> ataque = actual -> ataque * mult;
+    E -> defensa = actual -> defensa * mult;
+    E -> loot = NULL;
+    E -> arma = NULL;
+    E -> esJefe = actual -> esJefe;
+    E -> efecto = actual -> efecto;
+    for (int i = 0 ; i < 3 ; i++) {
+        E -> habilidades[i] = copiaSkill(actual -> habilidades[i]);
+    }
+    return E;
+}
+
+Item *obtenerItem(mapaItems, P) {
+    int poderAleatorio = randomRint(1, powerIndexPlayer(P)); // Indica la posicion aleatoria entre el rango 1 y el poder maximo que puede obtener el jugador actualmente
+    multiPar *actual = buscarMultiMapa(mapaItems, poderAleatorio); // Busca si existen objetos en ese poder
+    if(actual == NULL) {
+        actual = anteriorMultiMapa(mapaItems);
+        if (actual == NULL) return NULL; // No deberia entrar nunca aqui ya que existen items poder 1
+    }
+    List *auxLista = actual -> values; // Obtiene la lista de elementos
+    Item *auxItem = list_get(auxLista, randomRint(1, list_size(auxLista))); // Obtiene un indice aleatorio de la lista de elementos
+    return auxItem;
+}
+
+
+//// LOOT
+
+void asignarLootAleatorio(Jugador *P, Enemy *enemigo, multiMapa *mapaItems) {
+    if (!enemigo || !mapaItems || mapaItems -> size == 0) return;
+
+    int chance = randomRint(1, 10); // genera numero aleatorio entre 1 y 100 para determinar si no deja loot (10% probabilidad de tener loot)
+    if (chance == 1) {
+        enemigo->loot = NULL; // no deja loot
+        return;
+    }
+
+    int poderAleatorio = randomRint(1, powerIndexPlayer(P)); // Indica la posicion aleatoria entre el rango 1 y el poder maximo que puede obtener el jugador actualmente
+    multiPar *actual = buscarMultiMapa(mapaItems, poderAleatorio); // Busca si existen objetos en ese poder
+    if(actual == NULL) {
+        actual = anteriorMultiMapa(mapaItems);
+        if (actual == NULL) return;
+    }
+    List *auxLista = actual -> values; // Obtiene la lista de elementos
+    Item *auxItem = list_get(auxLista, randomRint(1, list_size(auxLista))); // Obtiene un indice aleatorio de la lista de elementos
+    enemigo -> loot = auxItem;
+    return;
+}
+
 
 //// CREACION DEL NIVEL
 
-Escenario **crearMatriz(Map *mapaItems, List *listaEnemigos, Jugador *P, List *listaJefes, float *mult) {
+Escenario **crearMatriz(multiMapa *mapaItems, List *listaEnemigos, Jugador *P, List *listaJefes, float *mult) {
     Escenario **matriz = malloc(sizeof(Escenario *) * 5); // Se almacena memoria para cada Escenario *
     for (int i = 0 ; i < 5 ; i++) { // Se recorren todos los elementos del Escenario *
         matriz[i] = malloc(sizeof(Escenario) * 5); // Se almacena memoria para cada Escenario **
@@ -117,13 +191,13 @@ Escenario **crearMatriz(Map *mapaItems, List *listaEnemigos, Jugador *P, List *l
                     break;
 
                 case ENEMIGO:
-                    matriz[i][j].enemigo = crearEnemigoPrueba();
-                    //matriz[i][j].enemigo = clonarEnemigo(listaEnemigos, P, mult);
+                    matriz[i][j].enemigo = clonarEnemigo(listaEnemigos, mult);
+                    asignarLootAleatorio(P, matriz[i][j].enemigo, mapaItems);
                     matriz[i][j].objeto = NULL;
                     break;
             
                 case ITEM:
-                    //matriz[i][j].objeto = clonarItem(mapaItems, P);
+                    //matriz[i][j].objeto = obtenerItem(mapaItems, P);
                     matriz[i][j].objeto = crearItemPrueba();
                     matriz[i][j].enemigo = NULL;
                     break;
@@ -149,7 +223,7 @@ Escenario **crearMatriz(Map *mapaItems, List *listaEnemigos, Jugador *P, List *l
     if (matriz[indX][indY].enemigo != NULL) { // Limpiar datos del enemigo previo si existia
          free(matriz[indX][indY].enemigo); 
     }
-    //matriz[indX][indY].enemigo = clonarJefe(listaJefes, P); 
+    //matriz[indX][indY].enemigo = clonarJefe(listaJefes, mult); 
     matriz[indX][indY].enemigo = crearJefePrueba();
     matriz[indX][indY].objeto = NULL;
 
@@ -585,9 +659,8 @@ void infoJugador(Jugador *P) {
     if (flag == false)
         puts("Sin habilidades disponibles.");
 
-    puts("Efectos Activos:");
-    for (Status *actual = list_first(P -> efectos); actual != NULL ; actual = list_next(P -> efectos))
-        printf("%s | Duracion: %d turnos \n", actual -> nombre, actual -> duracion);
+    puts("Efecto Activo:");
+        printf("%s | Duracion: %d turnos \n", P -> efecto -> nombre, P -> efecto -> duracion);
     puts("=======================");
 }
 
@@ -663,6 +736,7 @@ int main() {
     SetConsoleCP(CP_UTF8);
     init_random();
 
+
     elGuerrero();
     printf("Bienvenido a la aventura del Guerrero más Bravo que hayas conocido\n");
     printf("Menú Principal Beta\n");
@@ -689,7 +763,7 @@ int main() {
         player.inventario = list_create();
         player.habilidades[0] = NULL;
         player.habilidades[1] = NULL;
-        player.efectos = list_create();
+        player.efecto = list_create();
         player.posicion.posX = 0;
         player.posicion.posY = 0;
         interfazComienzo(str);
