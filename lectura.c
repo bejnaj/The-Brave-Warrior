@@ -1,12 +1,12 @@
 #include "lectura.h"
 
-Map *leer_status() {
+HashMap *leer_status() {
   FILE *archivo = fopen("data/Status.csv", "r");
   if (archivo == NULL) {
     perror("Error al abrir el archivo");
     return;
   }
-  Map *mapaStatus = map_create(estadoEqual);
+  HashMap *mapaStatus = createMap(50);
   // lee los nombres de cada columna
   char **campos;
   campos = leer_linea_csv(archivo, ',');
@@ -36,7 +36,7 @@ Map *leer_status() {
     // Agrega el Status al mapa
     int *key = malloc(sizeof(int));
     *key = Actual->id;
-    map_insert(mapaStatus, key, Actual);
+    insertMap(mapaStatus, key, Actual);
   }
   fclose(archivo); 
 }

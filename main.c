@@ -6,6 +6,7 @@
 #include "tdas/list.h"
 #include "tdas/extra.h"
 #include "tdas/multimapaItems.h"
+#include "tdas/hashmap.h"
 #include "tipoDato.h"
 #include "random.h"
 #include "interfaces.h"
@@ -605,8 +606,7 @@ void inventarioJugador(Jugador *P) {
         flag = false;
         cont = 0;
         switch (num) {
-            case 1: {// 1) Ver todo el inventario
-                
+            case 1: { // 1) Ver todo el inventario
                 for (Item *actual = list_first(P -> inventario); actual != NULL ; actual = list_next(P -> inventario)) { // Recorre la lista de items y los muestra todos, junto a su descripcion y stats segun sea necesario
                     flag = true;
                     puts(actual -> nombre);
@@ -902,6 +902,15 @@ int main() {
     SetConsoleCP(CP_UTF8);
     init_random();
 
+    multiMapa *mapaStatus = 
+
+    HashMap
+
+List *leer_skills();
+
+multiMapa *leer_items(List *listaItems, List *listaSkills);
+
+List *leer_Enemies(List *listaItems, List *listaSkills);
 
     elGuerrero();
     printf("Bienvenido a la aventura del Guerrero más Bravo que hayas conocido\n");
@@ -936,10 +945,3 @@ int main() {
 }
 }
 
-//void leer_status(List *listaStatus);
-
-//void leer_skills(List *listaSkills);
-
-//void leer_items(List *listaItems);
-
-//void leer_Enemies(List *listaEnemigos);

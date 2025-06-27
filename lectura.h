@@ -1,6 +1,6 @@
 #include "tdas/extra.h"
 #include "tdas/list.h"
-#include "tdas/map.h"
+#include "tdas/hashmap.h"
 #include "tipoDato.h"
 #include "tdas/multimapaItems.h"
 #include "balance.h"
@@ -9,7 +9,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
-Map *leer_status();
+HashMap *leer_status();
 
 List *leer_skills();
 
