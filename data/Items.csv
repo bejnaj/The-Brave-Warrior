@@ -15,7 +15,7 @@ Hongo Venenoso,tipoPocion,noEquipable,0;0;0,-5,NULL,"Pierdes 5 puntos de vida, p
 Hongo Curativo,tipoPocion,noEquipable,0;0;0,5,NULL,"Te curas 5 puntos de vida, bastante inutil"
 Hongo,tipoPocion,noEquipable,0;0;0,0,NULL,"No hace nada, hazlo por honga"
 Hongo Filoso,tipoPocion,arma,0;10;0,-10,NULL,"Tiene 10 puntos de daño, si lo consumes pierdes 10 puntos de vida (POR QUÉ TE COMERÍAS ALGO FILOSO)"
-Estaca de Madera,noConsumible,arma,0;50;0,0,NULL,"Tiene 15 puntos de daño, perfecto para matar vampiros"
+Estaca de Madera,noConsumible,arma,0;15;0,0,NULL,"Tiene 15 puntos de daño, perfecto para matar vampiros"
 Libro de los Gigantes,libroDeHabilidad,noEquipable,0;0;0,0,Dureza de Piel,"Aprende a duplicar tu defensa actual por 2 turnos, te sientes inmortal"
 Libro de la Regeneración,libroDeHabilidad,noEquipable,0;0;0,0,Regeneración,"Aprende a regenerar vida (+10) durante 3 turnos"
 Libro de la Bendición,libroDeHabilidad,noEquipable,0;0;0,0,Bendición,"Recibe una bendición que aumenta tu vida"
@@ -40,3 +40,4 @@ Botas Ligeras,noConsumible,armadura,10;5;5,0,NULL,"Botas que otorgan +10 vida, +
 Anillo de Vitalidad,noConsumible,armadura,30;0;0,0,NULL,"Anillo mágico, +30 vida"
 Amuleto de Fuerza,noConsumible,armadura,0;20;0,0,NULL,"Amuleto que otorga +20 daño"
 Capa de Protección,noConsumible,armadura,0;0;25,0,NULL,"Capa encantada, +25 defensa"
+Murasama,noConsumible,arma,0;70;0,0,NULL,"Espada legendaria, +70 de daño, Let's Dance"

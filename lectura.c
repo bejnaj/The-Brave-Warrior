@@ -193,7 +193,7 @@ List *leer_Enemies(char *str, List *listaSkills) {
     // Asigna memoria para el nombre del enemigo
     Actual->nombre = strdup(campos[0]);
     sscanf(campos[1], "%d;%d;%d", &Actual->vida, &Actual->ataque, &Actual->defensa);
-
+    Actual -> vidaActual = Actual -> vida;
     Actual->esJefe = (strcmp(campos[3], "True") == 0) ? true : false;
     // Procesa habilidades (puede haber hasta 3 separadas por ';')
     if (strcmp(campos[4], "NULL") != 0) {
