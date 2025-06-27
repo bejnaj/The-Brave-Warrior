@@ -5,23 +5,24 @@ Goblin Enfermera,60;8;4,NULL,False,Regeneración
 Rey Goblin,300;10;0,NULL,True,Envenenar;Herida Grave;Regeneración
 Orco,120;25;15,NULL,False,Enfurecer
 Orco Bruto,160;35;20,NULL,False,Aturdir
-Orco Chamán,100;15;10,NULL,False,Quemar
+Orco Chaman,100;15;10,NULL,False,Quemar
 Rey Orco,350;40;30,NULL,True,Enfurecer;Aturdir;Quemar
 Esqueleto,60;12;6,NULL,False,Desangrar
 Esqueleto Arquero,55;18;4,NULL,False,Debilitar
 Esqueleto Mago,50;10;3,NULL,False,Envenenar
 Skeletron,150;28;15,NULL,True,Desangrar;Debilitar;Envenenar
 Slime,40;8;2,NULL,False,NULL
+Honga,30;5;1,NULL,False,NULL
 Slime Venenoso,60;12;4,NULL,False,Envenenar
 Rey Slime,200;25;10,NULL,True,Envenenar;Aturdir
 Bandido,80;20;8,NULL,False,Herida Grave
-Bandido Líder,140;30;12,NULL,False,Herida Grave
-Murciélago,30;7;2,NULL,False,Desangrar
-Dragon pequeño sin alas ni piernas,100;20;10,NULL,False,Desangrar
-Murciélago Vampiro,80;18;6,NULL,False,Curación Menor
+Bandido Lider,140;30;12,NULL,False,Herida Grave
+Murcielago,30;7;2,NULL,False,Desangrar
+Dragon sin alas ni piernas,100;20;10,NULL,False,Desangrar
+Murcielago Vampiro,80;18;6,NULL,False,Curación Menor
 Creeper,90;15;5,NULL,False,Explotar
-Drácula,220;35;18,NULL,True,Desangrar;Curación Mayor;Congelar
-Alucard hijo de Drácula,500;50;25,NULL,True,Curación Mayor;Congelar;Maldecir
+Dracula,220;35;18,NULL,True,Desangrar;Curación Mayor;Congelar
+Alucard hijo de Dracula,500;50;25,NULL,True,Curación Mayor;Congelar;Maldecir
 Lobo,70;16;7,NULL,False,Desangrar
 Lobo Alfa,150;28;14,NULL,False,Desangrar
 Mago Oscuro,90;22;8,NULL,False,Maldecir
@@ -35,9 +36,9 @@ Completo Italiano (De italia),100;0;5,NULL,False,Enfurecer
 Pollo con problemas de ira,20;5;0,NULL,False,NULL
 LA mosca,1;2;0,NULL,False,NULL
 Enjambre de Moscas,50;15;0,NULL,False,NULL
-Jinete Avícola,50;30;10,NULL,False,NULL
-Ratón sin cola,20;10;0,NULL,False,NULL
-Ratón con cola,25;10;0,NULL,False,NULL
+Jinete Avicola,50;30;10,NULL,False,NULL
+Raton sin cola,20;10;0,NULL,False,NULL
+Raton con cola,25;10;0,NULL,False,NULL
 Poro,30;5;0,NULL,False,NULL
 Vampiro,150;20;0,NULL,False,NULL
 Completo con piernas,15;50;0,NULL,False,NULL
