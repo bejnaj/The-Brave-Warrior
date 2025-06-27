@@ -108,6 +108,7 @@ typedef struct {
     int ataque;
     int defensa;
     int nivel;
+    int xp;
     List *inventario;
     Skill *habilidades[2];
     Status *efecto;
