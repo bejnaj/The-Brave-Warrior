@@ -10,10 +10,10 @@ Rey Orco,350;40;30,NULL,True,Enfurecer;Aturdir;Quemar
 Esqueleto,60;12;6,NULL,False,Desangrar
 Esqueleto Arquero,55;18;4,NULL,False,Debilitar
 Esqueleto Mago,50;10;3,NULL,False,Envenenar
-Skeletron,150;28;15,NULL,True,Desangrar;DEbilitar;Envenenar
+Skeletron,150;28;15,NULL,True,Desangrar;Debilitar;Envenenar
 Slime,40;8;2,NULL,False,NULL
 Slime Venenoso,60;12;4,NULL,False,Envenenar
-Rey Slime,200;25;10,NULL,True,Envenenar;Aturdir;NULL
+Rey Slime,200;25;10,NULL,True,Envenenar;Aturdir
 Bandido,80;20;8,NULL,False,Herida Grave
 Bandido Líder,140;30;12,NULL,False,Herida Grave
 Murciélago,30;7;2,NULL,False,Desangrar
@@ -21,10 +21,19 @@ Murciélago Vampiro,80;18;6,NULL,False,Curación Menor
 Drácula,220;35;18,NULL,True,Desangrar;Curación Mayor;Congelar
 Lobo,70;16;7,NULL,False,Desangrar
 Lobo Alfa,150;28;14,NULL,False,Desangrar
-wizard,90;22;8,NULL,False,Maldecir
+Wizard,90;22;8,NULL,False,Maldecir
 Super Wizard,200;35;15,NULL,True,Maldecir;Bola de Fuego;Recuperación Rápida
 Zombie,40;25;0,NULL,False,Debilitar
 Zombie con Casco,90;25;0,NULL,False,Debilitar
 Gigante,300;5;5,NULL,False,Blindaje
 Gigante Noble,350;10;10,NULL,False,Blindaje
 Completo Italiano,100;0;5,Mostaza,False,Enfurecer
+Pollo,20;5;0,NULL,false,NULL
+Enjambre de Moscas,50;15;0,NULL,false,NULL
+Jinete Avícola,50;30;10,NULL,false,NULL
+Ratón sin cola,20;10;0,NULL,false,NULL
+Ratón con cola,25;10;0,NULL,false,NULL
+Poro,30;5;0,NULL,false,NULL
+Vampiro,150;20;0,NULL,false,NULL
+Completo con piernas,15;50;0,NULL,false,NULL
+Piñera Robot 3000,1000;30;10,NULL,true,Puchas;Recorcholis;Recrestas

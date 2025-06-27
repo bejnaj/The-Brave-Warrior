@@ -15,34 +15,36 @@
 //// PROTOTIPO DE FUNCIONES
 
 // CREACION DEL NIVEL
-Escenario **crearMatriz(/*Map *, List *, */Jugador */*, List **/); // Crea la matriz 5x5 de Escenario que representara al nivel actual junto a sus parametros predeterminados, ademas de establecer una nueva posicion aleatoria del jugador.
+Escenario **crearMatriz(Map *, List *, Jugador *, List *, float *mult); // Crea la matriz 5x5 de Escenario que representara al nivel actual junto a sus parametros predeterminados, ademas de establecer una nueva posicion aleatoria del jugador.
 
 // FUNCIONES DE LIMPIEZA
-void limpiarListaEstado(List *); // Limpia los elementos y nodos de una listas de estados
-void limpiarListaHabilidades(List *); // Limpia los elementos y nodos de una listas de habilidades
-void limpiarEnemigo(Enemy *); // Limpia los elementos de un enemigo
-void borrarLibro(List *, char *); // Borra la primera ocurrencia de un libro en una lista
-void limpiarPiso(Escenario ***); // Obtiene un puntero a una matriz de Escenario (Escenario ***), limpia todos sus elementos (Escenario contiene punteros y datos estaticos, por lo que no es necesario limpiar mas adentro) y luego marca el dato como NULL
+void limpiarListaEstado(List *L); // Limpia los elementos y nodos de una listas de estados
+void limpiarListaHabilidades(List *L); // Limpia los elementos y nodos de una listas de habilidades
+void limpiarEnemigo(Enemy *E); // Limpia los elementos de un enemigo
+void borrarLibro(List *L, char *str); // Borra la primera ocurrencia de un libro en una lista
+void limpiarPiso(Escenario ***S); // Obtiene un puntero a una matriz de Escenario (Escenario ***), limpia todos sus elementos (Escenario contiene punteros y datos estaticos, por lo que no es necesario limpiar mas adentro) y luego marca el dato como NULL
 
 //// MOVIMIENTO EN LA MAZMORRA
-void movimientoMazmorra(Jugador *, Escenario **); // Funcion encargada de mover al jugador en la direccion deseada
-int procesarTurno(Jugador *, Escenario **); // Procesa el turno, retornando un valor segun sea el estado de este
+void movimientoMazmorra(Jugador *P, Escenario **S); // Funcion encargada de mover al jugador en la direccion deseada
+int procesarTurno(Jugador *P, Escenario **S, float *mult); // Procesa el turno, retornando un valor segun sea el estado de este
 // RETURN
 // 0: Muerte, fin del juego
 // 1: Avanzar piso
 // 2: No hacer nada
-void mostrarNivel(Jugador *, Escenario **); // Muestra el estado del nivel actual
+void mostrarNivel(Jugador *P, Escenario **S); // Muestra el estado del nivel actual
 
-// INVENTARIO DEL JUGADOR
+// RELACIONADAS A JUGADOR
 Skill **crearArraySkills(List *, int *); // Crea un array que contenga las skills que se pueden aprender (usando los libros del inventario)
-void aprenderSkill(Jugador *, Skill *); // Aprende una skill en el primer slot disponible o pregunta cual quiere reemplazar
-void inventarioJugador(Jugador *); // Muestra diferentes opciones al jugador y permite que este seleccione alguna
+void aprenderSkill(Jugador *P, Skill *H); // Aprende una skill en el primer slot disponible o pregunta cual quiere reemplazar
+void inventarioJugador(Jugador *P); // Muestra diferentes opciones al jugador y permite que este seleccione alguna
 // 1) Ver todo el inventario
 // 2) Ver objetos usables en combate
 // 3) Ver habilidades aprendidas
 // 4) Aprender habilidades
 // 5) Salir del menu
-void infoJugador(Jugador *); // Muestra la informacion basica acerca del jugador (vida, habilidades, arma y armadura equipadas y los efectos activos)
+void infoJugador(Jugador *P); // Muestra la informacion basica acerca del jugador (vida, habilidades, arma y armadura equipadas y los efectos activos)
+void levelUp(Jugador *P); // aplica las mejoras al jugador
+
 
 //// INTERFAZ DE TESORO
 void interfazDeTesoro(Jugador *, Item *);
@@ -77,8 +79,7 @@ Enemy *crearEnemigoPrueba() {
     E -> loot = NULL;
     E -> arma = NULL;
     E -> esJefe = false;
-    E -> estado = NULL;
-    E -> habilidades = NULL;
+    E -> efecto = NULL;
     return E;
 } 
 
@@ -94,15 +95,14 @@ Enemy *crearJefePrueba() {
     E -> loot = NULL;
     E -> arma = NULL;
     E -> esJefe = false;
-    E -> estado = NULL;
-    E -> habilidades = NULL;
+    E -> efecto = NULL;
     return E;
 } 
 
 
 //// CREACION DEL NIVEL
 
-Escenario **crearMatriz(/*Map *mapaItems, List *listaEnemigos,*/ Jugador *P/*, List *listaJefes*/) {
+Escenario **crearMatriz(Map *mapaItems, List *listaEnemigos, Jugador *P, List *listaJefes, float *mult) {
     Escenario **matriz = malloc(sizeof(Escenario *) * 5); // Se almacena memoria para cada Escenario *
     for (int i = 0 ; i < 5 ; i++) { // Se recorren todos los elementos del Escenario *
         matriz[i] = malloc(sizeof(Escenario) * 5); // Se almacena memoria para cada Escenario **
@@ -118,7 +118,7 @@ Escenario **crearMatriz(/*Map *mapaItems, List *listaEnemigos,*/ Jugador *P/*, L
 
                 case ENEMIGO:
                     matriz[i][j].enemigo = crearEnemigoPrueba();
-                    //matriz[i][j].enemigo = clonarEnemigo(listaEnemigos, P);
+                    //matriz[i][j].enemigo = clonarEnemigo(listaEnemigos, P, mult);
                     matriz[i][j].objeto = NULL;
                     break;
             
@@ -168,12 +168,9 @@ Escenario **crearMatriz(/*Map *mapaItems, List *listaEnemigos,*/ Jugador *P/*, L
 
 //// FUNCIONES DE LIMPIEZA
 
-void limpiarListaEstado(List *L) { 
-    for (Status *actual = list_first(L); actual != NULL ; actual = list_first(L)) {
-        list_popCurrent(L);
-        free(actual -> nombre);
-        free(actual);
-    }
+void limpiarEstado(Status *S) { 
+    free(S -> nombre);
+    free(S);
 }
 
 void limpiarListaHabilidades(List *L) { 
@@ -189,9 +186,9 @@ void limpiarEnemigo(Enemy *E) {
     list_clean(E -> loot); // Limpia la lista de loot, que contiene punteros a Item
     free(E -> loot);
 
-    limpiarListaEstado(E -> estado); // Limpia la lista de estados
-    free(E -> estado);
-    E -> estado = NULL;
+    limpiarEstado(E -> efecto); // Limpia la lista de estados
+    free(E -> efecto);
+    E -> efecto = NULL;
 
     limpiarListaHabilidades(E -> habilidades);
     free(E -> habilidades);
@@ -286,7 +283,7 @@ void movimientoMazmorra(Jugador *P, Escenario **S) { // Funcion encargada de mov
     }
 }
 
-int procesarTurno(Jugador *P, Escenario **S) { //Procesa el turno, retornando un valor segun sea el estado de este
+int procesarTurno(Jugador *P, Escenario **S, float *mult) { //Procesa el turno, retornando un valor segun sea el estado de este
     //returns:
     //0: muerte
     //1: avanzar piso
@@ -303,13 +300,22 @@ int procesarTurno(Jugador *P, Escenario **S) { //Procesa el turno, retornando un
                 borrarLineas(1); 
                 break;
 
-            case ENEMIGO:
-                borrarLineas(6); 
-                comenzarPelea(P, aux -> enemigo);
-                /*if (!comenzarPelea(P, aux -> enemigo)) // Suponiendo que retorna 1 si fue victoria y 0 si fue derrota
-                    return 0; */
+            case ENEMIGO: {
+                borrarLineas(6);
+                int disc = comenzarPelea(P, aux -> enemigo); // Suponiendo que retorna 1 si fue victoria, 0 si fue derrota y 2 si huyo
+                if (disc == 1) {
+                    P -> xp++; // Sube un punto de xp
+                    if((P -> xp) % 3 == 0) { // Pregunta si se puede subir de nivel
+                        P -> nivel++;
+                        P -> xp = 0;
+                        levelUp(P);
+                    }
+                } else
+                    if (disc == 0) { // Si murio
+                        pantallaGameOver();
+                    }
                 break;
-
+            }
             case ITEM:
                 interfazDeTesoro(P, aux -> objeto);
                 break;
@@ -321,19 +327,32 @@ int procesarTurno(Jugador *P, Escenario **S) { //Procesa el turno, retornando un
                 printf("(Vida: %d, Daño: %d, Defensa: %d). ¿Estás listo para pelear?\n", aux -> enemigo -> vida, aux -> enemigo -> ataque, aux -> enemigo -> defensa);
                 puts("1) Si / 2) No");
                 verificarOpcionConBorrado(&num, 2);
-                if (num == 1)
-                    comenzarPelea(P, aux -> enemigo);
-                else {
-                    puts("Decidiste no enfrentarte al jefe... pero la mazmorra castiga la cobardía alterando su estructura.");
-                    limpiarPiso(&S);
-                    return 1;
+                if (num == 1) {
+                    if(comenzarPelea(P, aux -> enemigo))
+                        levelUp(P);
+                    else
+                        return 0;
+
+                    (*mult) *= 1.07;
+                    printb("¡Has vencido al jefe! El aire se despeja y la mazmorra cambia de forma...\n");
+                    printb("La dificultad ha aumentado. Multiplicador actual: %.2fx\n", *mult);
+                    Sleep(1500);
+                    borrarLineas(2);
+                } else {
+                    printb("Decidiste no enfrentarte al jefe... pero la mazmorra castiga la cobardía alterando su estructura.\n");
+                    Sleep(1000);
+                    borrarLineas(1);
+                    
+                    
                 }
-                break;
+                limpiarPiso(&S);
+                return 1;
             }
         }
-    } else
+    } else {
         puts("Ya has vistado este escenario previamente.");
         borrarLineas(7);
+    }
     return 2;
 }
 
@@ -567,11 +586,10 @@ void infoJugador(Jugador *P) {
         puts("Sin habilidades disponibles.");
 
     puts("Efectos Activos:");
-    for (Status *actual = list_first(P -> efecto); actual != NULL ; actual = list_next(P -> efectos))
+    for (Status *actual = list_first(P -> efectos); actual != NULL ; actual = list_next(P -> efectos))
         printf("%s | Duracion: %d turnos \n", actual -> nombre, actual -> duracion);
     puts("=======================");
 }
-
 
 //// INTERFAZ DE TESORO
 
@@ -671,16 +689,17 @@ int main() {
         player.inventario = list_create();
         player.habilidades[0] = NULL;
         player.habilidades[1] = NULL;
-        player.efecto = NULL;
+        player.efectos = list_create();
         player.posicion.posX = 0;
         player.posicion.posY = 0;
         interfazComienzo(str);
         limpiarPantalla();
         Escenario **nivelActual = crearMatriz(&player);
+        float mult = 1;
         while(1) {
             mostrarNivel(&player, nivelActual);
             movimientoMazmorra(&player, nivelActual);
-            procesarTurno(&player, nivelActual);
+            procesarTurno(&player, nivelActual, &mult);
         }
         break;
     }

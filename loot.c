@@ -1,5 +1,6 @@
 #include "random.h"
 #include <stdbool.h>
+#include <stdlib.h>
 #include "tdas/list.h"
 #include "tipoDato.h"
 
@@ -16,13 +17,13 @@ void asignarLootAleatorio(Enemy *enemigo, List *listaItems) {
     if (!enemigo || !listaItems || list_size(listaItems) == 0) return;
 
     int chance = randomRint(1, 100); // genera numero aleatorio entre 1 y 100 para determinar si no deja loot (20% probabilidad)
-    if (chance <= 20) {
+    if (chance <= 80) {
         enemigo->loot = NULL; // no deja loot
         return;
     }
 
     enemigo->loot = list_create(); // crea una lista para el loot del enemigo
-    int cantidadLoot = randomRint(1, 3); // decide cuanto loot soltara el enemigo (entre 1 y 3 items)
+    int cantidadLoot = randomRint(1, 2); // decide cuanto loot soltara el enemigo (entre 1 y 2 items)
     int totalItems = list_size(listaItems);
     int intentosMax = 100; // limitar la cantidad de intentos para evitar bucles infinitos
 

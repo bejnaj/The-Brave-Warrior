@@ -1,17 +1,12 @@
-#include "tdas/extra.h"
-#include "tdas/list.h"
-#include "tdas/map.h"
-#include "tipoDato.h"
-#include "balance.h"
+#include "lectura.h"
 
-
-void leer_status(Map *mapaStatus) {
+Map *leer_status() {
   FILE *archivo = fopen("data/Status.csv", "r");
   if (archivo == NULL) {
     perror("Error al abrir el archivo");
     return;
   }
-
+  Map *mapaStatus = map_create(estadoEqual);
   // lee los nombres de cada columna
   char **campos;
   campos = leer_linea_csv(archivo, ',');
@@ -46,19 +41,14 @@ void leer_status(Map *mapaStatus) {
   fclose(archivo); 
 }
 
-int cmpId(void *a, void *b) {
-    Status *sa = (Status *)a;
-    int *id = (int *)b;
-    return sa->id - *id;
-}
-
-void leer_skills(List *listaSkills, List *listaStatus) {
+List *leer_skills(List *listaStatus) {
   FILE *archivo = fopen("data/Skills.csv", "r");
   if (archivo == NULL) {
     perror(
         "Error al abrir el archivo");
     return;
   }
+  List *listaSkills = list_create();
 
   // lee los nombres de cada columna
   char **campos;
@@ -83,7 +73,7 @@ void leer_skills(List *listaSkills, List *listaStatus) {
     Status *estado = NULL;
     if (strcmp(campos[5], "NULL") != 0) {
         int idEstado = atoi(campos[5]);
-        Status *estado = (Status *)list_find(listaStatus, &idEstado, cmpId);
+        Status *estado = (Status *)list_find(listaStatus, &idEstado, cmpID);
         Actual->estado = estado;
     } else {
         Actual->estado = NULL;
@@ -95,18 +85,15 @@ void leer_skills(List *listaSkills, List *listaStatus) {
   fclose(archivo); 
 }
 
-int cmpSkill(void *a, void *b) {
-    Skill *sa = (Skill *)a;
-    char *nombre = (char *)b;
-    return strcmp(sa->nombre, nombre);
-}
-
-void leer_items(List *listaItems, List *listaSkills) {
+multiMapa *leer_items(List *listaItems, List *listaSkills) {
   FILE *archivo = fopen("data/Items.csv", "r");
   if (archivo == NULL) {
     perror("Error al abrir el archivo");
     return;
   }
+
+
+  multiMapa *mapaItems = crearMultiMapa(200); // Crea el multimapa de items con capacidad para 200 elementos
 
   // lee los nombres de cada columna
   char **campos;
@@ -121,6 +108,7 @@ void leer_items(List *listaItems, List *listaSkills) {
     }
     // Asigna memoria para el nombre del item
     Actual->nombre = strdup(campos[0]);
+
     // Como se usara el item
     if (strcmp(campos[1], "noConsumible") == 0) Actual->tipoCons = noConsumible;
     else if (strcmp(campos[1], "libroDeHabilidad") == 0) Actual->tipoCons = libroDeHabilidad;
@@ -133,25 +121,24 @@ void leer_items(List *listaItems, List *listaSkills) {
     
     // Asigna los bonus del item (separado por ';')
     int vida = 0, ataque = 0, defensa = 0;
+    
     sscanf(campos[3], "%d;%d;%d", &vida, &ataque, &defensa);
     Actual->statBonus.vidaBonus = vida;
     Actual->statBonus.AtaqueBonus = ataque;
     Actual->statBonus.DefensaBonus = defensa;
+
     // Asigna la vida recuperada por el item
     Actual->vidaRecuperada = atoi(campos[4]);
+
     // Enlaza la habilidad aprendida si corresponde
     if (strcmp(campos[5], "NULL") == 0) {
         Actual->habilidadAprendida = NULL;
     } else {
-        // Buscar la skill por nombre en listaSkills
-        Skill *skill = NULL;
-        if (strcmp(campos[5], "NULL") == 0) {
-            Actual->habilidadAprendida = NULL;
-        } else {
-            Skill *found = (Skill *)list_find(listaSkills, campos[5], cmpSkill);
-            Actual->habilidadAprendida = found;
-        }
-    }
+      // Buscar la skill por nombre en listaSkills
+      Skill *found = (Skill *)list_find(listaSkills, campos[5], cmpSkill);
+      Actual->habilidadAprendida = found;
+      }
+
     // Asigna la descripcion del item
     char *comillaInicio = strchr(campos[6], '"');
     char *comillaFin = NULL;
@@ -167,18 +154,23 @@ void leer_items(List *listaItems, List *listaSkills) {
     } else {
         Actual->descripcion = strdup(campos[6]);
     }
-    // Agrega el item a la lista
-    list_pushFront(listaItems, Actual);
+    // Calcula el poder del item
+    Actual -> poder = powerIndex(Actual);
+
+    // Agrega el item al mapa
+    insertarMultiMapa(mapaItems, Actual -> poder, Actual);
   }
-  fclose(archivo); 
+  fclose(archivo);
+  return mapaItems;
 }
 
-void leer_Enemies(List *listaEnemigos, List *listaItems, List *listaSkills) {
+List *leer_Enemies(List *listaItems, List *listaSkills) {
   FILE *archivo = fopen("data/Enemies.csv", "r");
   if (archivo == NULL) {
     perror("Error al abrir el archivo");
     return;
   }
+  List *listaEnemigos = list_create(); // Crea la lista de enemigos
 
   // lee los nombres de cada columna
   char **campos;
@@ -191,25 +183,27 @@ void leer_Enemies(List *listaEnemigos, List *listaItems, List *listaSkills) {
         perror("Error al asignar memoria para el enemigo");
         continue;
     }
+    for (int j = 0; j < 3; j++) Actual->habilidades[j] = NULL;
+
     // Asigna memoria para el nombre del enemigo
     Actual->nombre = strdup(campos[0]);
     sscanf(campos[1], "%d;%d;%d", &Actual->vida, &Actual->ataque, &Actual->defensa);
     //asignarLootAleatorio(Actual, listaItems);
     Actual->esJefe = (strcmp(campos[3], "True") == 0) ? true : false;
-    // Procesa habilidades (puede haber varias separadas por ';')
-    Actual->habilidades = list_create();
+    // Procesa habilidades (puede haber hasta 3 separadas por ';')
     if (strcmp(campos[4], "NULL") != 0) {
-        char *habilidadesStr = strdup(campos[4]);
-        char *token = strtok(habilidadesStr, ";");
-        while (token != NULL) {
-            Skill *habilidadActual = (Skill *)list_find(listaSkills, token, cmpSkill);
-            if (habilidadActual) list_pushBack(Actual->habilidades, habilidadActual);
-            token = strtok(NULL, ";");
-        }
-        free(habilidadesStr);
+      List* L = split_string(campos[4], ";");
+      int i = 0;
+      for (char *subcampoActual = list_first(L) ; subcampoActual != NULL && i < 3 ; subcampoActual = list_first(L)) { // parsea y copia cada habilidad
+        Skill *aux = (Skill *)list_find(listaSkills, subcampoActual, cmpSkill);
+        Actual -> habilidades[i] = copiaSkill(aux);
+        free(list_popFront(L));
+        i++;
+      }
     }
     // Agrega el enemigo a la lista
     list_pushFront(listaEnemigos, Actual);
   }
-  fclose(archivo); 
+  fclose(archivo);
+  return listaEnemigos;
 }

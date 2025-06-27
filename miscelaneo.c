@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <windows.h>
 #include <stdarg.h>
+#include "tipoDato.h"
 
 void limpiarSTDIN() {
     int ch;
@@ -123,4 +124,33 @@ void borrarLineas(int x) {
         printf("\033[F"); // Cursor una línea arriba
         printf("\033[2K"); // Borra la línea completa
     }
+}
+
+Skill *copiaSkill(Skill *elem) {
+    Skill *copia = malloc(sizeof(Skill));
+    copia -> nombre = elem -> nombre;
+    copia -> tipo = elem -> tipo;
+    copia -> duracion = elem -> duracion;
+    copia -> cooldown = elem -> cooldown;
+    copia -> cooldownActual = 0;
+    copia -> vidaCurada = elem -> vidaCurada;
+    copia -> estado = elem -> estado;
+    copia -> hacia = elem -> hacia;
+    return copia;
+}
+
+int cmpSkill(Skill *a, char *b) {
+    Skill *sa = (Skill *)a;
+    char *nombre = (char *)b;
+    return strcmp(sa->nombre, nombre);
+}
+
+int cmpID(Status *a, char *b) {
+    Status *sa = (Status *)a;
+    int *id = (int *)b;
+    return sa->id - *id;
+}
+
+int estadoEqual(Status *k1, Status *k2) {
+    return k1 == k2;
 }

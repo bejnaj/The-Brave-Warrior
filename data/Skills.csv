@@ -25,5 +25,8 @@ Somnolencia,4,1,estado,0,25,0
 Enfurecer,6,2,estado,0,19,1
 Protección Divina,8,2,estado,0,21,1
 Dureza de Piel,5,2,estado,0,8,1
-Bola de Fuego,5,0,curacion,-100,,0
-
+Bola de Fuego,5,0,curación,-100,,0
+Golpe Severo,2,1,Curacion,-30,0,0
+Puchas,4,0,curacion,-30,0,0
+Recorcholis,4,0,curacion,100,0,1
+Recrestas,4,3,estado,0,29,1

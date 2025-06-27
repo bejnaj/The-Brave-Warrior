@@ -2,11 +2,6 @@
 #define TIPOS_H
 #include <stdbool.h>
 #include "tdas/list.h"
-#include "tdas/map.h"
-#include "tdas/extra.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
 //// ENUMS
 
@@ -83,6 +78,7 @@ typedef struct {
     Bonus statBonus;
     Skill *habilidadAprendida;
     int vidaRecuperada;
+    int poder;
 } Item;
 
 typedef struct {
@@ -112,6 +108,7 @@ typedef struct {
     int ataque;
     int defensa;
     int nivel;
+    int xp;
     List *inventario;
     Skill *habilidades[2];
     Status *efecto;
