@@ -125,8 +125,11 @@ Enemy *crearJefePrueba() {
 //// CLONADO
 
 Enemy *clonarEnemigo(List *L, int mult) {
-    int pos = randomRint(1, list_size(L)); // Se elige una posicion random de la lista
-    Enemy *actual = list_get(L, pos);
+    Enemy *actual;
+    do {
+        int pos = randomRint(0, list_size(L)); // Se elige una posicion random de la lista
+        actual = list_get(L, pos);
+    } while (actual -> esJefe == true);
     Enemy *E = malloc(sizeof(Enemy));
     E -> nombre = strdup(actual -> nombre); // Se clona el elemento
     E -> vida = actual -> vida * mult;
@@ -151,7 +154,7 @@ Item *obtenerItem(mapaItems, P) {
         if (actual == NULL) return NULL; // No deberia entrar nunca aqui ya que existen items poder 1
     }
     List *auxLista = actual -> values; // Obtiene la lista de elementos
-    Item *auxItem = list_get(auxLista, randomRint(1, list_size(auxLista))); // Obtiene un indice aleatorio de la lista de elementos
+    Item *auxItem = list_get(auxLista, randomRint(0, list_size(auxLista))); // Obtiene un indice aleatorio de la lista de elementos
     return auxItem;
 }
 
@@ -174,7 +177,7 @@ void asignarLootAleatorio(Jugador *P, Enemy *enemigo, multiMapa *mapaItems) {
         if (actual == NULL) return;
     }
     List *auxLista = actual -> values; // Obtiene la lista de elementos
-    Item *auxItem = list_get(auxLista, randomRint(1, list_size(auxLista))); // Obtiene un indice aleatorio de la lista de elementos
+    Item *auxItem = list_get(auxLista, randomRint(0, list_size(auxLista))); // Obtiene un indice aleatorio de la lista de elementos
     enemigo -> loot = auxItem;
     return;
 }
@@ -902,15 +905,12 @@ int main() {
     SetConsoleCP(CP_UTF8);
     init_random();
 
-    multiMapa *mapaStatus = 
-
-    HashMap
-
-List *leer_skills();
-
-multiMapa *leer_items(List *listaItems, List *listaSkills);
-
-List *leer_Enemies(List *listaItems, List *listaSkills);
+    // Proceso de lectura de datos
+    HashMap *mapaStatus = leer_status("data/Status.csv");
+    List *listaSkills = leer_skills("data/Skills.csv");
+    multiMapa *mapaItems = leer_items("data/Items.csv" , listaSkills);
+    List *listaEnemigos = leer_Enemies("data/Enemies.csv", listaSkills);
+    List *listaJefes = obtenerJefes(listaEnemigos);
 
     elGuerrero();
     printf("Bienvenido a la aventura del Guerrero más Bravo que hayas conocido\n");
@@ -929,7 +929,8 @@ List *leer_Enemies(List *listaItems, List *listaSkills);
         Jugador *player = inicializarJugador(str);
         interfazComienzo(str);
         limpiarPantalla();
-        Escenario **nivelActual = crearMatriz(&player);
+        int mult = 1; // Conmtrola la dificultad del piso
+        Escenario **nivelActual = crearMatriz(mapaItems, listaEnemigos, player, listaJefes, &mult);
         float mult = 1;
         while(1) {
             mostrarNivel(&player, nivelActual);
