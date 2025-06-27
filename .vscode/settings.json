@@ -11,6 +11,10 @@
         "windows.h": "c",
         "random.h": "c",
         "combate.h": "c",
-        "miscelaneo.h": "c"
+        "miscelaneo.h": "c",
+        "array": "c",
+        "tipodato.h": "c",
+        "lectura.h": "c",
+        "map.h": "c"
     }
 }

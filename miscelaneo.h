@@ -26,6 +26,18 @@ void printcv(int vel, const char *fmt, ...);
 // Imprime texto animado con velocidad fija (10 ms por carácter)
 void printb(const char *fmt, ...);
 
+// Copia una skill
+Skill *copiaSkill(Skill *elem);
+
+// Para comparar una skill y un nombre de skill (char *)
+int cmpSkill(Skill *a, char *b);
+
+// Para comparar un status y un nombre de status (char *)
+int cmpID(Status *a, char *b);
+
+// Compara dos Items
+int estadoEqual(Status *k1, Status *k2);
+
 // borra x cantidad de lineas de texto
 void borrarLineas(int x);
 

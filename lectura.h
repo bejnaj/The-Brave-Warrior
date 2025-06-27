@@ -1,13 +1,18 @@
-#include "lectura.c"
 #include "tdas/extra.h"
 #include "tdas/list.h"
 #include "tdas/map.h"
 #include "tipoDato.h"
+#include "tdas/multimapaItems.h"
+#include "balance.h"
+#include "miscelaneo.h"
+#include <string.h>
+#include <stdbool.h>
+#include <stdlib.h>
 
-void leer_status(Map *mapaStatus);
+Map *leer_status();
 
-void leer_skills(List *mapaSkills);
+List *leer_skills();
 
-void leer_items(List *mapaItems);
+multiMapa *leer_items(List *listaItems, List *listaSkills);
 
-void leer_Enemies(List *mapaEnemigos);
+List *leer_Enemies(List *listaItems, List *listaSkills);

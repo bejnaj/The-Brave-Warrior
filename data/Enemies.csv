@@ -10,10 +10,10 @@ Rey Orco,350;40;30,NULL,True,Enfurecer;Aturdir;Quemar
 Esqueleto,60;12;6,NULL,False,Desangrar
 Esqueleto Arquero,55;18;4,NULL,False,Debilitar
 Esqueleto Mago,50;10;3,NULL,False,Envenenar
-Skeletron,150;28;15,NULL,True,Desangrar;DEbilitar;Envenenar
+Skeletron,150;28;15,NULL,True,Desangrar;Debilitar;Envenenar
 Slime,40;8;2,NULL,False,NULL
 Slime Venenoso,60;12;4,NULL,False,Envenenar
-Rey Slime,200;25;10,NULL,True,Envenenar;Aturdir;NULL
+Rey Slime,200;25;10,NULL,True,Envenenar;Aturdir
 Bandido,80;20;8,NULL,False,Herida Grave
 Bandido Líder,140;30;12,NULL,False,Herida Grave
 Murciélago,30;7;2,NULL,False,Desangrar

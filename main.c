@@ -77,8 +77,7 @@ Enemy *crearEnemigoPrueba() {
     E -> loot = NULL;
     E -> arma = NULL;
     E -> esJefe = false;
-    E -> estado = NULL;
-    E -> habilidades = NULL;
+    E -> efecto = NULL;
     return E;
 } 
 
@@ -94,8 +93,7 @@ Enemy *crearJefePrueba() {
     E -> loot = NULL;
     E -> arma = NULL;
     E -> esJefe = false;
-    E -> estado = NULL;
-    E -> habilidades = NULL;
+    E -> efecto = NULL;
     return E;
 } 
 
@@ -168,12 +166,9 @@ Escenario **crearMatriz(/*Map *mapaItems, List *listaEnemigos,*/ Jugador *P/*, L
 
 //// FUNCIONES DE LIMPIEZA
 
-void limpiarListaEstado(List *L) { 
-    for (Status *actual = list_first(L); actual != NULL ; actual = list_first(L)) {
-        list_popCurrent(L);
-        free(actual -> nombre);
-        free(actual);
-    }
+void limpiarEstado(Status *S) { 
+    free(S -> nombre);
+    free(S);
 }
 
 void limpiarListaHabilidades(List *L) { 
@@ -189,9 +184,9 @@ void limpiarEnemigo(Enemy *E) {
     list_clean(E -> loot); // Limpia la lista de loot, que contiene punteros a Item
     free(E -> loot);
 
-    limpiarListaEstado(E -> estado); // Limpia la lista de estados
-    free(E -> estado);
-    E -> estado = NULL;
+    limpiarEstado(E -> efecto); // Limpia la lista de estados
+    free(E -> efecto);
+    E -> efecto = NULL;
 
     limpiarListaHabilidades(E -> habilidades);
     free(E -> habilidades);
@@ -566,9 +561,8 @@ void infoJugador(Jugador *P) {
     if (flag == false)
         puts("Sin habilidades disponibles.");
 
-    puts("Efectos Activos:");
-    for (Status *actual = list_first(P -> efectos); actual != NULL ; actual = list_next(P -> efectos))
-        printf("%s | Duracion: %d turnos \n", actual -> nombre, actual -> duracion);
+    puts("Efecto Activo:");
+        printf("%s | Duracion: %d turnos \n", P -> efecto -> nombre, P -> efecto -> duracion);
     puts("=======================");
 }
 
@@ -671,7 +665,7 @@ int main() {
         player.inventario = list_create();
         player.habilidades[0] = NULL;
         player.habilidades[1] = NULL;
-        player.efectos = list_create();
+        player.efecto = list_create();
         player.posicion.posX = 0;
         player.posicion.posY = 0;
         interfazComienzo(str);
