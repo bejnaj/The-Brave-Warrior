@@ -23,7 +23,7 @@ multiMapa *crearMultiMapa(long capacity);
 
 void insertarMultiMapa(multiMapa * table, int key, void * value);
 
-void eraseMap(multiMapa * table, int key);
+void limpiarMapa(multiMapa * table);
 
 void sizeDown(multiMapa* map);
 

@@ -159,18 +159,8 @@ Skill *copiaSkill(Skill *elem) {
     return copia;
 }
 
-int cmpSkill(Skill *a, char *b) {
+int cmpSkill(void *a, void *b) {
     Skill *sa = (Skill *)a;
     char *nombre = (char *)b;
     return strcmp(sa->nombre, nombre);
-}
-
-int cmpID(Status *a, char *b) {
-    Status *sa = (Status *)a;
-    int *id = (int *)b;
-    return sa->id - *id;
-}
-
-int estadoEqual(Status *k1, Status *k2) {
-    return k1 == k2;
 }

@@ -3,25 +3,28 @@
 #include <stdlib.h>
 #include <windows.h>
 #include <locale.h>
+#include <math.h>
 #include "tdas/list.h"
 #include "tdas/extra.h"
 #include "tdas/multimapaItems.h"
 #include "tdas/hashmap.h"
 #include "tipoDato.h"
 #include "random.h"
+#include "lectura.h"
 #include "interfaces.h"
 #include "miscelaneo.h"
 #include "combate.h"
+
 
 //// PROTOTIPO DE FUNCIONES
 
 //// CLONADO
 
 // Clona un enemigo aleatorio de una lista y le asigna el multiplicador correspondiente
-Enemy *clonarEnemigo(List *L, int mult);
+Enemy *clonarEnemigo(List *L, float mult);
 
 // Obtiene un item aleatorio del mapa de items
-Item *obtenerItem(mapaItems, P);
+Item *obtenerItem(multiMapa *mapaItems, Jugador *P);
 
 //// LOOT
 
@@ -124,7 +127,7 @@ Enemy *crearJefePrueba() {
 
 //// CLONADO
 
-Enemy *clonarEnemigo(List *L, int mult) {
+Enemy *clonarEnemigo(List *L, float mult) {
     Enemy *actual;
     do {
         int pos = randomRint(0, list_size(L)); // Se elige una posicion random de la lista
@@ -146,7 +149,7 @@ Enemy *clonarEnemigo(List *L, int mult) {
     return E;
 }
 
-Item *obtenerItem(mapaItems, P) {
+Item *obtenerItem(multiMapa *mapaItems, Jugador *P) {
     int poderAleatorio = randomRint(1, powerIndexPlayer(P)); // Indica la posicion aleatoria entre el rango 1 y el poder maximo que puede obtener el jugador actualmente
     multiPar *actual = buscarMultiMapa(mapaItems, poderAleatorio); // Busca si existen objetos en ese poder
     if(actual == NULL) {
@@ -207,7 +210,7 @@ Escenario **crearMatriz(multiMapa *mapaItems, List *listaEnemigos, Jugador *P, L
                     break;
 
                 case ENEMIGO:
-                    matriz[i][j].enemigo = clonarEnemigo(listaEnemigos, mult);
+                    matriz[i][j].enemigo = clonarEnemigo(listaEnemigos, *mult);
                     asignarLootAleatorio(P, matriz[i][j].enemigo, mapaItems);
                     matriz[i][j].objeto = NULL;
                     break;
@@ -263,25 +266,15 @@ void limpiarEstado(Status *S) {
     free(S);
 }
 
-void limpiarListaHabilidades(List *L) { 
-    for (Skill *actual = list_first(L); actual != NULL ; actual = list_first(L)) {
-        free(actual -> nombre);
-        list_popCurrent(L);
-        free(actual);
-    }
-}
 
 void limpiarEnemigo(Enemy *E) { 
     free(E -> nombre); //Limpia el nombre guardado dinamicamente
-    list_clean(E -> loot); // Limpia la lista de loot, que contiene punteros a Item
     free(E -> loot);
 
     limpiarEstado(E -> efecto); // Limpia la lista de estados
     free(E -> efecto);
     E -> efecto = NULL;
 
-    limpiarListaHabilidades(E -> habilidades);
-    free(E -> habilidades);
     free(E);
 }
 
@@ -412,7 +405,7 @@ int procesarTurno(Jugador *P, Escenario **S, float *mult) { //Procesa el turno, 
                     lootearEnemigo(P, aux -> enemigo);
                 } else
                     if (disc == 0) { // Si murio
-                        pantallaGameOver();
+                        return 0;
                     }
                 break;
             }
@@ -794,7 +787,7 @@ Jugador *inicializarJugador(char *str) { // Inicializa un jugador con el nombre 
     P -> inventario = list_create();
     P -> habilidades[0] = NULL;
     P -> habilidades[1] = NULL;
-    P -> efecto = list_create();
+    P -> efecto = NULL;
     P -> posicion.posX = 0;
     P -> posicion.posY = 0;
     return P;
@@ -907,8 +900,8 @@ int main() {
 
     // Proceso de lectura de datos
     HashMap *mapaStatus = leer_status("data/Status.csv");
-    List *listaSkills = leer_skills("data/Skills.csv");
-    multiMapa *mapaItems = leer_items("data/Items.csv" , listaSkills);
+    List *listaSkills = leer_skills("data/Skills.csv", mapaStatus);
+    multiMapa *mapaItems = leer_items("data/Items.csv", listaSkills);
     List *listaEnemigos = leer_Enemies("data/Enemies.csv", listaSkills);
     List *listaJefes = obtenerJefes(listaEnemigos);
 
@@ -929,13 +922,12 @@ int main() {
         Jugador *player = inicializarJugador(str);
         interfazComienzo(str);
         limpiarPantalla();
-        int mult = 1; // Conmtrola la dificultad del piso
+        float mult = 1; // Controla la dificultad del piso
         Escenario **nivelActual = crearMatriz(mapaItems, listaEnemigos, player, listaJefes, &mult);
-        float mult = 1;
         while(1) {
-            mostrarNivel(&player, nivelActual);
-            movimientoMazmorra(&player, nivelActual);
-            procesarTurno(&player, nivelActual, &mult);
+            mostrarNivel(player, nivelActual);
+            movimientoMazmorra(player, nivelActual);
+            procesarTurno(player, nivelActual, &mult);
         }
         break;
     }

@@ -13,7 +13,7 @@ HashMap *leer_status(char *str);
 
 List *leer_skills(char *str, HashMap *mapaEstados);
 
-multiMapa *leer_items(char *str, List *listaItems, List *listaSkills);
+multiMapa *leer_items(char *str, List *listaSkills);
 
 List *leer_Enemies(char *str, List *listaSkills);
 

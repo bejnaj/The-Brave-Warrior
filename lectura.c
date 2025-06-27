@@ -71,7 +71,7 @@ List *leer_skills(char *str, HashMap *mapaEstados) {
     else if (strcmp(campos[3], "estado") == 0) Actual->tipo = estado;
     Actual->vidaCurada = atoi(campos[4]);
     if (strcmp(campos[5], "NULL") != 0) {
-        Status *estado = searchMap(mapaEstados, campos[5]);
+        Status *estado = (Status *)searchMap(mapaEstados, campos[5]) -> value;
         Actual->estado = estado;
     } else {
         Actual->estado = NULL;
@@ -84,11 +84,11 @@ List *leer_skills(char *str, HashMap *mapaEstados) {
   return listaSkills;
 }
 
-multiMapa *leer_items(char *str, List *listaItems, List *listaSkills) {
+multiMapa *leer_items(char *str, List *listaSkills) {
   FILE *archivo = fopen(str, "r");
   if (archivo == NULL) {
     perror("Error al abrir el archivo");
-    return;
+    return NULL;
   }
 
 
@@ -167,7 +167,7 @@ List *leer_Enemies(char *str, List *listaSkills) {
   FILE *archivo = fopen(str, "r");
   if (archivo == NULL) {
     perror("Error al abrir el archivo");
-    return;
+    return NULL;
   }
   List *listaEnemigos = list_create(); // Crea la lista de enemigos
 
