@@ -1,0 +1,27 @@
+# Compilados y ejecutables
+*.exe
+*.o
+*.obj
+*.out
+*.dll
+*.a
+*.so
+*.log
+
+# Archivos temporales de editor
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Archivos de VSCode
+.vscode/
+
+# Archivos de respaldo
+*.bak
+*.tmp
+
+# Otros
+*.user
+*.cache

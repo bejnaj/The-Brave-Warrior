@@ -907,42 +907,84 @@ int main() {
 
     // Proceso de lectura de datos
     HashMap *mapaStatus = leer_status("data/Status.csv");
-    List *listaSkills = leer_skills("data/Skills.csv");
-    multiMapa *mapaItems = leer_items("data/Items.csv" , listaSkills);
+    List *listaSkills = leer_skills("data/Skills.csv", mapaStatus);
+    multiMapa *mapaItems = leer_items("data/Items.csv", NULL, listaSkills);
     List *listaEnemigos = leer_Enemies("data/Enemies.csv", listaSkills);
-    List *listaJefes = obtenerJefes(listaEnemigos);
 
-    elGuerrero();
-    printf("Bienvenido a la aventura del Guerrero más Bravo que hayas conocido\n");
-    printf("Menú Principal Beta\n");
-    printf("Elige una opción:\n1) Jugar\n2) Cómo jugar\n3) Salir\n");
-    int coso;
-    verificarOpcionConBorrado(&coso, 3);
-    switch (coso)
-    {
-    case 1:{
-        limpiarPantalla();
-        printf("\n\nIngresa el nombre de tu guerrero:");
-        char str[40];
-        fgets(str, sizeof(str), stdin);
-        limpiarSTDIN();
-        Jugador *player = inicializarJugador(str);
-        interfazComienzo(str);
-        limpiarPantalla();
-        int mult = 1; // Conmtrola la dificultad del piso
-        Escenario **nivelActual = crearMatriz(mapaItems, listaEnemigos, player, listaJefes, &mult);
-        float mult = 1;
-        while(1) {
-            mostrarNivel(&player, nivelActual);
-            movimientoMazmorra(&player, nivelActual);
-            procesarTurno(&player, nivelActual, &mult);
+    int opcion = 0;
+    do {
+        printf("\n===== MENÚ PRINCIPAL =====\n");
+        printf("1) Ver Status\n");
+        printf("2) Ver Skills\n");
+        printf("3) Ver Items\n");
+        printf("4) Ver Enemigos\n");
+        printf("5) Salir\n");
+        printf("Seleccione una opción: ");
+        scanf("%d", &opcion);
+        getchar(); // limpiar buffer
+
+        switch(opcion) {
+            case 1: {
+                printf("\n--- STATUS ---\n");
+                Pair *par = firstMap(mapaStatus);
+                while (par != NULL) {
+                    Status *s = (Status*)par->value;
+                    printf("ID: %s | Nombre: %s | Tipo: %d | Coste: %d | Operación: %d | Cantidad: %.2f\n",
+                        (char*)par->key, s->nombre, s->tipo, s->costeTurnos, s->op, s->cantidad);
+                    par = nextMap(mapaStatus);
+                }
+                break;
+            }
+            case 2: {
+                printf("\n--- SKILLS ---\n");
+                for (Skill *sk = list_first(listaSkills); sk != NULL; sk = list_next(listaSkills)) {
+                    printf("Nombre: %s | Cooldown: %d | Duración: %d | Tipo: %d | Vida Curada: %d | Estado: %s | Hacia: %d\n",
+                        sk->nombre, sk->cooldown, sk->duracion, sk->tipo, sk->vidaCurada,
+                        sk->estado ? sk->estado->nombre : "Ninguno", sk->hacia);
+                }
+                break;
+            }
+            case 3: {
+                printf("\n--- ITEMS ---\n");
+                // Usar las funciones de iteración del multimapa
+                multiPar *par = primerElemMultiMapa(mapaItems);
+                while (par != NULL) {
+                    List *bucket = par->values;
+                    if (bucket && list_size(bucket) > 0) {
+                        Item *it = list_first(bucket);
+                        while (it != NULL) {
+                            printf("Nombre: %s | Tipo Consumible: %d | Tipo Equipable: %d | Vida: %d | Ataque: %d | Defensa: %d | Vida Recuperada: %d | Habilidad: %s | Descripción: %s\n",
+                                it->nombre, it->tipoCons, it->tipoEquip, it->statBonus.vida, it->statBonus.ataque, it->statBonus.defensa,
+                                it->vidaRecuperada, it->habilidadAprendida ? it->habilidadAprendida->nombre : "Ninguna", it->descripcion);
+                            it = list_next(bucket);
+                        }
+                    }
+                    par = siguienteMultiMapa(mapaItems);
+                }
+                break;
+            }
+            case 4: {
+                printf("\n--- ENEMIGOS ---\n");
+                for (Enemy *en = list_first(listaEnemigos); en != NULL; en = list_next(listaEnemigos)) {
+                    printf("Nombre: %s | Vida: %d | Ataque: %d | Defensa: %d | Jefe: %s | Habilidades: ",
+                        en->nombre, en->vida, en->ataque, en->defensa, en->esJefe ? "Sí" : "No");
+                    for (int i = 0; i < 3; ++i) {
+                        if (en->habilidades[i])
+                            printf("%s%s", en->habilidades[i]->nombre, (i < 2 && en->habilidades[i+1]) ? ", " : "");
+                    }
+                    printf("\n");
+                }
+                break;
+            }
+            case 5:
+                printf("Saliendo...\n");
+                break;
+            default:
+                printf("Opción inválida. Intente de nuevo.\n");
         }
-        break;
-    }
-    case 3:{
-        break;
-    }
+    } while (opcion != 5);
+
+    // Liberar memoria si es necesario
+    // ...
     return 0;
 }
-}
-
