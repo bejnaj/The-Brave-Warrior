@@ -567,7 +567,7 @@ void infoJugador(Jugador *P) {
         puts("Sin habilidades disponibles.");
 
     puts("Efectos Activos:");
-    for (Status *actual = list_first(P -> efectos); actual != NULL ; actual = list_next(P -> efectos))
+    for (Status *actual = list_first(P -> efecto); actual != NULL ; actual = list_next(P -> efectos))
         printf("%s | Duracion: %d turnos \n", actual -> nombre, actual -> duracion);
     puts("=======================");
 }
@@ -671,7 +671,7 @@ int main() {
         player.inventario = list_create();
         player.habilidades[0] = NULL;
         player.habilidades[1] = NULL;
-        player.efectos = list_create();
+        player.efecto = NULL;
         player.posicion.posX = 0;
         player.posicion.posY = 0;
         interfazComienzo(str);
