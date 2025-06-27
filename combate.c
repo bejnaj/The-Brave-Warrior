@@ -6,6 +6,16 @@
 #include <math.h>
 #include "random.h"
 #include "miscelaneo.h"
+#include "tdas/extra.h"
+
+const char* tipoToStr(tipoStatus t) {
+    switch (t) {
+        case dano: return "daño";
+        case defensa: return "defensa";
+        case saltarTurno: return "pierdes turno";
+        case vida: return "vida";
+    }
+}
 
 const char* tipoSkillStr(tipoSkill tipo) {
     switch (tipo) {
@@ -15,12 +25,21 @@ const char* tipoSkillStr(tipoSkill tipo) {
     }
 }
 
+Status* copiarStatus(Status* original) {
+    Status* copia = malloc(sizeof(Status));
+    *copia = *original;
+    copia->nombre = strdup(original->nombre);
+    return copia;
+}
+
 void printearBarras(Jugador *P, Enemy *E){
     limpiarPantalla();
-    printf("Elige una opción...Sin titubear!!\n1) Pelear\n2) Objetos\n3) Huir\n\n");
+    printf("\n\n\nElige una opción...Sin titubear!!\n1) Pelear\n2) Objetos\n3) Huir\n\n");
     char vidatuya[P->vida + 1],vidaenemiga[E->vida + 1]; // +1 para el carácter nulo '\0'
     vidatuya[0] = '\0';
     vidaenemiga[0] = '\0';
+    if (P->vidaActual > P->vida) P->vidaActual = P->vida;
+    if (E->vidaActual > E->vida) E->vidaActual = E->vida;
     int barrastuya = P->vidaActual / 10;
     int barrasenemiga = E->vidaActual / 10;
     for (int i = 0; i < barrastuya; i++) {
@@ -29,27 +48,38 @@ void printearBarras(Jugador *P, Enemy *E){
     for (int i = 0; i < barrasenemiga; i++) {
         strcat(vidaenemiga, "|");
     }
-    printf("Tu Vida: %s (%d/%d) Defensa: %d", vidatuya, P->vidaActual, P->vida, P->defensa);
-    if(P->efecto!=NULL){
-        printf(" (%s)",P->efecto->nombre);
-        if((P->habilidades[0]->cooldownActual>0)||(P->habilidades[1]->cooldownActual>0)){
-            if(P->habilidades[0]->cooldownActual>0) printf(" -%s (%d)",P->habilidades[0]->nombre,P->habilidades[0]->cooldownActual);
-            if(P->habilidades[1]->cooldownActual>0) printf(" -%s (%d)",P->habilidades[1]->nombre,P->habilidades[1]->cooldownActual);
-        }
-    }
-    printf("\n");
-    printf("Enemigo: %s (%d/%d) Defensa: %d", vidaenemiga, E->vidaActual, E->vida, E->defensa);
-    if(E->efecto!=NULL){
-        printf(" (%s)",E->efecto->nombre);
+    if ((P->habilidades[0] && P->habilidades[0]->cooldownActual > 0) ||
+        (P->habilidades[1] && P->habilidades[1]->cooldownActual > 0)) {
+        if (P->habilidades[0] && P->habilidades[0]->cooldownActual > 0)
+            printf(" (%s: quedan %d turnos)", P->habilidades[0]->nombre, P->habilidades[0]->cooldownActual);
+        if (P->habilidades[1] && P->habilidades[1]->cooldownActual > 0)
+            printf(" (%s: quedan %d turnos)", P->habilidades[1]->nombre, P->habilidades[1]->cooldownActual);
     }
     printf("\n\n");
+    printf("Tu Vida: %s (%d/%d) Defensa: %d", vidatuya, P->vidaActual, P->vida, P->defensa);
+    if (P->efecto != NULL && P->efecto->duracion > 0) {
+        printf(" %s", P->efecto->nombre);
+        if (P->efecto->op == multiplicacion) printf(" (%sx%.1f)",tipoToStr(P->efecto->tipo),P->efecto->cantidad);
+        if (P->efecto->op == suma){
+            if (P->efecto->cantidad>0) printf(" (+%.0f %s)",P->efecto->cantidad,tipoToStr(P->efecto->tipo));
+            if (P->efecto->cantidad<0) printf(" (-%.0f %s)",P->efecto->cantidad,tipoToStr(P->efecto->tipo));
+        }
+    }
+    printf("\n\n");
+    printf("Enemigo: %s (%d/%d) Defensa: %d", vidaenemiga, E->vidaActual, E->vida, E->defensa);
+    if (E->efecto != NULL && E->efecto->duracion > 0) {
+        printf(" %s", E->efecto->nombre);
+        if (E->efecto->op == multiplicacion) printf(" (%sx%.1f)",tipoToStr(E->efecto->tipo),E->efecto->cantidad);
+        if (E->efecto->op == suma) printf(" (+%.0f %s)",E->efecto->cantidad,tipoToStr(E->efecto->tipo));
+    }
+    printf("\n\n\n");
 }
 
 // Calcula el daño infligido considerando la defensa del enemigo
 int Ataque(int dano, int defensaEnemiga, int fullVida) {
     double vidaTeorica = fullVida + defensaEnemiga;
     double porcentaje = (double)dano / vidaTeorica;
-    int resultado = (int)(porcentaje * fullVida);
+    int resultado = (int)round(porcentaje * fullVida);
     if (resultado < 0) resultado = 0;
     return resultado;
 }
@@ -104,7 +134,6 @@ int usarObjeto(Jugador *P,Enemy*E) {
 
     int num;
     printb("Elige que item usar: \n");
-    Sleep(1000);
     verificarOpcionConBorrado(&num, i);
     num -= 1;
 
@@ -180,7 +209,6 @@ bool intentarHuir(Jugador *P, Enemy *E){
 
 void Habilidad(Jugador *P, Enemy *E, int h, int lanzaSkill) {
     Skill *skill = NULL;
-
     if (lanzaSkill == 1) { // Jugador lanza la habilidad
         skill = P->habilidades[h];
         if (!skill) return;
@@ -203,13 +231,61 @@ void Habilidad(Jugador *P, Enemy *E, int h, int lanzaSkill) {
             }
         } else if (skill->tipo == estado) {       // ESTADO
             if (skill->hacia == 1) { // Uno mismo (JUGADOR)
-                P->efecto = skill->estado;
+                if (P->efecto){ // devuelve valores predeterminados y NULLea y reemplaza efecto anterior como en pokemon
+                    if (P->efecto->op == suma){
+                        if (P->efecto->tipo==defensa) P->defensa -= P->efecto->cantidad;
+                        if (P->efecto->tipo==dano) P->ataque -= P->efecto->cantidad;
+                    }
+                    if (P->efecto->op== multiplicacion){
+                        if (P->efecto->tipo==vida) P->vida = (int)(P->vida / P->efecto->cantidad);
+                        if (P->efecto->tipo==defensa) P->defensa = (int)(P->defensa / P->efecto->cantidad);
+                        if (P->efecto->tipo==dano) P->ataque = (int)(P->ataque / P->efecto->cantidad);
+                    }
+                    free(P->efecto->nombre);
+                    free(P->efecto);
+                    P->efecto = NULL;
+                }
+                P->efecto = copiarStatus(skill->estado); // se copia en el objetivo el efecto
+                P->efecto->duracion = skill->duracion;   // se agrega la duracion al efecto
+                if (P->efecto->op == suma){              // se suman/multiplican los bonuses adecuadamente
+                    if (P->efecto->tipo==defensa) P->defensa += P->efecto->cantidad;
+                    if (P->efecto->tipo==dano) P->ataque += P->efecto->cantidad;
+                }
+                if (P->efecto->op== multiplicacion){
+                    if (P->efecto->tipo==vida) P->vida = (int)(P->vida * P->efecto->cantidad);
+                    if (P->efecto->tipo==defensa) P->defensa = (int)(P->defensa * P->efecto->cantidad);
+                    if (P->efecto->tipo==dano) P->ataque = (int)(P->ataque * P->efecto->cantidad);
+                }
                 printearBarras(P,E);
                 printf("Es tu turno\n\n");
                 printb("%s ahora tiene el estado: %s\n", P->nombre, skill->estado->nombre);
                 Sleep(2000);
             } else {                // Al enemigo (JUGADOR)
-                E->efecto = skill->estado;
+                if (E->efecto){ // devuelve valores predeterminados y NULLea y reemplaza efecto anterior como en pokemon
+                    if (E->efecto->op == suma){
+                        if (E->efecto->tipo==defensa) E->defensa -= E->efecto->cantidad;
+                        if (E->efecto->tipo==dano) E->ataque -= E->efecto->cantidad;
+                    }
+                    if (E->efecto->op== multiplicacion){
+                        if (E->efecto->tipo==vida) E->vida = (int)(E->vida / E->efecto->cantidad);
+                        if (E->efecto->tipo==defensa) E->defensa = (int)(E->defensa / E->efecto->cantidad);
+                        if (E->efecto->tipo==dano) E->ataque = (int)(E->ataque / E->efecto->cantidad);
+                    }
+                    free(E->efecto->nombre);
+                    free(E->efecto);
+                    E->efecto = NULL;
+                }
+                E->efecto = copiarStatus(skill->estado); // se copia en el objetivo el efecto
+                E->efecto->duracion = skill->duracion;   // se agrega la duracion al efecto
+                if (E->efecto->op == suma){              // se suman/multiplican los bonuses adecuadamente
+                    if (E->efecto->tipo==defensa) E->defensa += E->efecto->cantidad;
+                    if (E->efecto->tipo==dano) E->ataque += E->efecto->cantidad;
+                }
+                if (E->efecto->op== multiplicacion){
+                    if (E->efecto->tipo==vida) E->vida = (int)(E->vida * E->efecto->cantidad);
+                    if (E->efecto->tipo==defensa) E->defensa = (int)(E->defensa * E->efecto->cantidad);
+                    if (E->efecto->tipo==dano) E->ataque = (int)(E->ataque * E->efecto->cantidad);
+                }
                 printearBarras(P,E);
                 printf("Es tu turno\n\n");
                 printb("%s ha aplicado el estado %s a %s\n", P->nombre, skill->estado->nombre, E->nombre);
@@ -237,13 +313,61 @@ void Habilidad(Jugador *P, Enemy *E, int h, int lanzaSkill) {
             }
         } else if (skill->tipo == estado) {      // ESTADO
             if (skill->hacia == 1) { // Uno mismo (ENEMIGO)
-                E->efecto = skill->estado;
+                if (E->efecto){ // devuelve valores predeterminados y NULLea y reemplaza efecto anterior como en pokemon
+                    if (E->efecto->op == suma){
+                        if (E->efecto->tipo==defensa) E->defensa -= E->efecto->cantidad;
+                        if (E->efecto->tipo==dano) E->ataque -= E->efecto->cantidad;
+                    }
+                    if (E->efecto->op== multiplicacion){
+                        if (E->efecto->tipo==vida) E->vida = (int)(E->vida / E->efecto->cantidad);
+                        if (E->efecto->tipo==defensa) E->defensa = (int)(E->defensa / E->efecto->cantidad);
+                        if (E->efecto->tipo==dano) E->ataque = (int)(E->ataque / E->efecto->cantidad);
+                    }
+                    free(E->efecto->nombre);
+                    free(E->efecto);
+                    E->efecto = NULL;
+                }
+                E->efecto = copiarStatus(skill->estado); // se copia en el objetivo el efecto
+                E->efecto->duracion = skill->duracion;   // se agrega la duracion al efecto
+                if (E->efecto->op == suma){              // se suman/multiplican los bonuses adecuadamente
+                    if (E->efecto->tipo==defensa) E->defensa += E->efecto->cantidad;
+                    if (E->efecto->tipo==dano) E->ataque += E->efecto->cantidad;
+                }
+                if (E->efecto->op== multiplicacion){
+                    if (E->efecto->tipo==vida) E->vida = (int)(E->vida * E->efecto->cantidad);
+                    if (E->efecto->tipo==defensa) E->defensa = (int)(E->defensa * E->efecto->cantidad);
+                    if (E->efecto->tipo==dano) E->ataque = (int)(E->ataque * E->efecto->cantidad);
+                }
                 printearBarras(P,E);
                 printf("Turno del enemigo\n\n");
                 printb("%s ahora tiene el estado: %s\n", E->nombre, skill->estado->nombre);
                 Sleep(2000);
             } else {                // Al enemigo (ENEMIGO)
-                P->efecto = skill->estado;
+                if (P->efecto){ // devuelve valores predeterminados y NULLea y reemplaza efecto anterior como en pokemon
+                    if (P->efecto->op == suma){
+                        if (P->efecto->tipo==defensa) P->defensa -= P->efecto->cantidad;
+                        if (P->efecto->tipo==dano) P->ataque -= P->efecto->cantidad;
+                    }
+                    if (P->efecto->op== multiplicacion){
+                        if (P->efecto->tipo==vida) P->vida = (int)(P->vida / P->efecto->cantidad);
+                        if (P->efecto->tipo==defensa) P->defensa = (int)(P->defensa / P->efecto->cantidad);
+                        if (P->efecto->tipo==dano) P->ataque = (int)(P->ataque / P->efecto->cantidad);
+                    }
+                    free(P->efecto->nombre);
+                    free(P->efecto);
+                    P->efecto = NULL;
+                }
+                P->efecto = copiarStatus(skill->estado); // se copia en el objetivo el efecto
+                P->efecto->duracion = skill->duracion;   // se agrega la duracion al efecto
+                if (P->efecto->op == suma){              // se suman/multiplican los bonuses adecuadamente
+                    if (P->efecto->tipo==defensa) P->defensa += P->efecto->cantidad;
+                    if (P->efecto->tipo==dano) P->ataque += P->efecto->cantidad;
+                }
+                if (P->efecto->op== multiplicacion){
+                    if (P->efecto->tipo==vida) P->vida = (int)(P->vida * P->efecto->cantidad);
+                    if (P->efecto->tipo==defensa) P->defensa = (int)(P->defensa * P->efecto->cantidad);
+                    if (P->efecto->tipo==dano) P->ataque = (int)(P->ataque * P->efecto->cantidad);
+                }
                 printearBarras(P,E);
                 printf("Turno del enemigo\n\n");
                 printb("%s ha aplicado el estado %s a %s\n", E->nombre, skill->estado->nombre, P->nombre);
@@ -280,12 +404,13 @@ void Pelear(Jugador *P, Enemy *E){ //FALTA GESTIONAR LAS HABILIDADES, SI NO HAY 
     if(num==1){
         int ataque;
         for (size_t i = 0; i<2;i++){
-                ataque = randomVint(Ataque(P->ataque,E->defensa,E->vida),50);
+                ataque = randomVint(Ataque(P->ataque,E->defensa,E->vida),25);
             }
+        if ((float)(ataque-(Ataque(P->ataque,E->defensa,E->vida) * 1.2))>0) ataque*=2;
         E->vidaActual -= ataque; // <-- Aplica el daño al enemigo
         printearBarras(P,E);
         printf("Es tu turno\n");
-        if (ataque>(Ataque(P->ataque,E->defensa,E->vida) * 1.3)){
+        if (ataque>(Ataque(P->ataque,E->defensa,E->vida) * 1.2)){
             printb("GOLPE CRÍTICO!!\n");
             Sleep(750);
             printb("%s ha recibido %d puntos de daño!\n",E->nombre,ataque);
@@ -308,7 +433,7 @@ void Pelear(Jugador *P, Enemy *E){ //FALTA GESTIONAR LAS HABILIDADES, SI NO HAY 
 
 int comenzarPelea(Jugador *P, Enemy *E/*, Map *status*/) {
     // Ejemplo simple de combate por turnos
-    printb("¡Te has encontrado a %s!", E->nombre);
+    printb("\n\n\n¡Te has encontrado a %s!", E->nombre);
     Sleep(1500);
     printf("\033[2K\r");// borra la linea y deja el cursor en el principio de la misma
     //printf("\033[E"); // Mueve el cursor una línea siguiente
@@ -332,39 +457,71 @@ int comenzarPelea(Jugador *P, Enemy *E/*, Map *status*/) {
     for (int i = 0; i < barrasenemiga; i++) {
         strcat(vidaenemiga, "|");
     }
-    printb("Tu Vida: %s (%d/%d) Defensa: %d\n", vidatuya, P->vidaActual, P->vida, P->defensa);
-    printb("Enemigo: %s (%d/%d) Defensa: %d\n\n", vidaenemiga, E->vidaActual, E->vida, E->defensa);
+    printb("\n\nTu Vida: %s (%d/%d) Defensa: %d\n\n", vidatuya, P->vidaActual, P->vida, P->defensa);
+    printb("Enemigo: %s (%d/%d) Defensa: %d\n\n\n", vidaenemiga, E->vidaActual, E->vida, E->defensa);
     int num,obj;
     bool escape = false;
     while (P->vidaActual > 0 && E->vidaActual > 0) {
         // Turno del jugador
+        if (P->efecto && P->efecto->tipo == vida && P->efecto->op==suma) {  // liberar y poner a NULL
+            P->vidaActual += (int)(P->efecto->cantidad);
+            P->efecto->duracion--; // <--- REDUCE LA DURACIÓN AQUÍ
+            if (P->efecto->duracion <= 0){
+                free(P->efecto->nombre);
+                free(P->efecto);
+                P->efecto= NULL;
+            }
+        } else if(P->efecto && P->efecto->duracion <= 0){
+            // Revertir bonus/multiplicador si corresponde
+            if (P->efecto->op == suma) {
+                if (P->efecto->tipo == defensa) P->defensa -= (int)(P->efecto->cantidad);
+                if (P->efecto->tipo == dano) P->ataque -= (int)(P->efecto->cantidad);
+            }
+            if (P->efecto->op == multiplicacion) {
+                if (P->efecto->tipo == vida) P->vidaActual = (int)(P->vidaActual / P->efecto->cantidad);
+                if (P->efecto->tipo == defensa) P->defensa = (int)(P->defensa / P->efecto->cantidad);
+                if (P->efecto->tipo == dano) P->ataque = (int)(P->ataque / P->efecto->cantidad);
+            }
+            free(P->efecto->nombre);
+            free(P->efecto);
+            P->efecto = NULL;
+        }
         if (P->habilidades[0] && P->habilidades[0]->cooldownActual)
         P->habilidades[0]->cooldownActual--;
         if (P->habilidades[1] && P->habilidades[1]->cooldownActual)
         P->habilidades[1]->cooldownActual--;
         printearBarras(P,E);
-        printb("Es tu turno\n");
-        verificarOpcionConBorrado(&num,3);
-        borrarLineas(1);
-        switch (num)
-        {
-        case 1:
-            Pelear(P,E);
-            printearBarras(P,E);
-            break;
-        case 2:
-            obj = usarObjeto(P,E);
-            printearBarras(P,E);
-            break;
-        case 3:
-            escape = intentarHuir(P,E);
-            if(escape){
+
+        if(P->efecto!=NULL&&(P->efecto->tipo == saltarTurno)){
+            P->efecto->costeTurnos-=1;
+            printb("Estás %s,",P->efecto->nombre);
+            Sleep(500);
+            printb("¡PIERDES EL TURNO!\n");
+            Sleep(1500);
+        } else {
+            printb("Es tu turno\n");
+            verificarOpcionConBorrado(&num,3);
+            borrarLineas(1);
+            switch (num)
+            {
+            case 1:
+                Pelear(P,E);
+                printearBarras(P,E);
                 break;
-            } else;
-        default:
-            break;
+            case 2:
+                obj = usarObjeto(P,E);
+                printearBarras(P,E);
+                break;
+            case 3:
+                escape = intentarHuir(P,E);
+                if(escape){
+                    break;
+                } else;
+            default:
+                break;
+            }
+            if (escape) return 2;
         }
-        if (escape) return 2;
         if (E->vidaActual <= 0) {
             E->vidaActual = 0;
             borrarLineas(4);
@@ -373,6 +530,33 @@ int comenzarPelea(Jugador *P, Enemy *E/*, Map *status*/) {
             return 1;
         } else {
             // Turno del enemigo
+            for (size_t i=0;i<3;i++){
+                if (E->habilidades[i] && E->habilidades[i]->cooldownActual)
+                E->habilidades[i]->cooldownActual--;
+            }
+            if (E->efecto && E->efecto->tipo == vida && E->efecto->op==suma) {  // liberar y poner a NULL
+                E->vidaActual += (int)(E->efecto->cantidad);
+                E->efecto->duracion--; // <--- REDUCE LA DURACIÓN AQUÍ
+                if (E->efecto->duracion <= 0){
+                    free(E->efecto->nombre);
+                    free(E->efecto);
+                    E->efecto= NULL;
+                }
+            } else if(E->efecto && E->efecto->duracion <= 0){
+                // Revertir bonus/multiplicador si corresponde
+                if (E->efecto->op == suma) {
+                    if (E->efecto->tipo == defensa) E->defensa -= (int)(E->efecto->cantidad);
+                    if (E->efecto->tipo == dano) E->ataque -= (int)(E->efecto->cantidad);
+                }
+                if (E->efecto->op == multiplicacion) {
+                    if (E->efecto->tipo == vida) E->vidaActual = (int)(E->vidaActual / E->efecto->cantidad);
+                    if (E->efecto->tipo == defensa) E->defensa = (int)(E->defensa / E->efecto->cantidad);
+                    if (E->efecto->tipo == dano) E->ataque = (int)(E->ataque / E->efecto->cantidad);
+                }
+                free(E->efecto->nombre);
+                free(E->efecto);
+                E->efecto = NULL;
+            }
             printearBarras(P,E);
             printb("Turno del enemigo\n");
             Sleep(1000);
@@ -381,13 +565,13 @@ int comenzarPelea(Jugador *P, Enemy *E/*, Map *status*/) {
                 Sleep(1000);
                 int ataque;
                 for (size_t i = 0; i<2;i++){
-                    ataque = randomVint(Ataque(E->ataque,P->defensa,P->vida),50);
+                    ataque = randomVint(Ataque(E->ataque,P->defensa,P->vida),25);
                 }
                     P->vidaActual -= ataque; // <-- Aplica el daño al enemigo
                 borrarLineas(5);
                 printearBarras(P,E);
                 printf("Turno del enemigo\n");
-                if (ataque>(Ataque(E->ataque,P->defensa,P->vida) * 1.3)){
+                if (ataque>(Ataque(E->ataque,P->defensa,P->vida) * 1.2)){
                     printb("GOLPE CRÍTICO!!\n%s ha recibido %d puntos de daño!\n",P->nombre,ataque);
                     Sleep(1000);
                 } else {
@@ -396,6 +580,9 @@ int comenzarPelea(Jugador *P, Enemy *E/*, Map *status*/) {
                 }
                 Sleep(2000);
                 borrarLineas(3);
+            } else {
+                printb("El enemigo te tiene mala asi que te lanza una habilidad");
+                Sleep(1000);
             }
         }
         if (P->vidaActual <= 0) {
@@ -467,9 +654,9 @@ int main(){
     itemPrueba.descripcion = strdup("Te curas 200 puntos de vida, esta infravalorado");
     itemPrueba.tipoCons = tipoPocion;
     itemPrueba.tipoEquip = noEquipable;
-    itemPrueba.statBonus.vidaBonus = 0;
-    itemPrueba.statBonus.AtaqueBonus = 0;
-    itemPrueba.statBonus.DefensaBonus = 25;
+    itemPrueba.statBonus.vida = 0;
+    itemPrueba.statBonus.ataque = 0;
+    itemPrueba.statBonus.defensa = 25;
     itemPrueba.habilidadAprendida = NULL;
     itemPrueba.vidaRecuperada = 200;
     
@@ -478,16 +665,14 @@ int main(){
     itemPrueba2.descripcion = strdup("Una espada básica de hierro, +25 de daño");
     itemPrueba2.tipoCons = noConsumible;
     itemPrueba2.tipoEquip = ARMA;
-    itemPrueba2.statBonus.vidaBonus = 0;
-    itemPrueba2.statBonus.AtaqueBonus = 25;
-    itemPrueba2.statBonus.DefensaBonus = 0;
+    itemPrueba2.statBonus.vida = 0;
+    itemPrueba2.statBonus.ataque = 25;
+    itemPrueba2.statBonus.defensa = 0;
     itemPrueba2.habilidadAprendida = NULL;
     itemPrueba2.vidaRecuperada = 0;
     List *L = list_create();
     list_pushBack(L, &itemPrueba);
     list_pushBack(L, &itemPrueba2);
-    
-    
     
     Jugador jugadorPrueba;
     jugadorPrueba.nombre = "Felipe";
@@ -495,15 +680,15 @@ int main(){
     jugadorPrueba.armadura = NULL;
     jugadorPrueba.nivel = 10;
     jugadorPrueba.vida = (int)(100 * pow(1.03, ((float)jugadorPrueba.nivel - 1)))
-    + (jugadorPrueba.armadura ? jugadorPrueba.armadura->statBonus.vidaBonus : 0)
-    + (jugadorPrueba.arma ? jugadorPrueba.arma->statBonus.vidaBonus : 0);
+    + (jugadorPrueba.armadura ? jugadorPrueba.armadura->statBonus.vida : 0)
+    + (jugadorPrueba.arma ? jugadorPrueba.arma->statBonus.vida : 0);
     jugadorPrueba.vidaActual = jugadorPrueba.vida;
     jugadorPrueba.ataque = (int)(25 * pow(1.03, ((float)jugadorPrueba.nivel - 1)))
-    + (jugadorPrueba.armadura ? jugadorPrueba.armadura->statBonus.AtaqueBonus : 0)
-    + (jugadorPrueba.arma ? jugadorPrueba.arma->statBonus.AtaqueBonus : 0);
+    + (jugadorPrueba.armadura ? jugadorPrueba.armadura->statBonus.ataque : 0)
+    + (jugadorPrueba.arma ? jugadorPrueba.arma->statBonus.ataque : 0);
     jugadorPrueba.defensa = (int)(10 * pow(1.03, ((float)jugadorPrueba.nivel - 1)))
-    + (jugadorPrueba.armadura ? jugadorPrueba.armadura->statBonus.DefensaBonus : 0)
-    + (jugadorPrueba.arma ? jugadorPrueba.arma->statBonus.DefensaBonus : 0);
+    + (jugadorPrueba.armadura ? jugadorPrueba.armadura->statBonus.defensa : 0)
+    + (jugadorPrueba.arma ? jugadorPrueba.arma->statBonus.defensa : 0);
     jugadorPrueba.inventario = L;
     jugadorPrueba.habilidades[0] = skillRegeneracion;
     jugadorPrueba.habilidades[1] = skillEnvenenar/*bolaDeFuego*/; // o puedes poner otra skill si quieres
@@ -514,17 +699,19 @@ int main(){
     Enemy enemigoPrueba;
     enemigoPrueba.nombre = "Orco";
     enemigoPrueba.arma = NULL;
-    enemigoPrueba.vida = (int)(1000 * pow(1.05, ((float)jugadorPrueba.nivel - 1)))
-    + (enemigoPrueba.arma ? enemigoPrueba.arma->statBonus.vidaBonus : 0);
+    enemigoPrueba.vida = (int)(500 * pow(1.05, ((float)jugadorPrueba.nivel - 1)))
+    + (enemigoPrueba.arma ? enemigoPrueba.arma->statBonus.vida : 0);
     enemigoPrueba.vidaActual = enemigoPrueba.vida;
     enemigoPrueba.ataque = (int)(5 * pow(1.05, ((float)jugadorPrueba.nivel - 1)))
-    + (enemigoPrueba.arma ? enemigoPrueba.arma->statBonus.AtaqueBonus : 0);
+    + (enemigoPrueba.arma ? enemigoPrueba.arma->statBonus.ataque : 0);
     enemigoPrueba.defensa = (int)(100 * pow(1.05, ((float)jugadorPrueba.nivel - 1)))
-    + (enemigoPrueba.arma ? enemigoPrueba.arma->statBonus.DefensaBonus : 0);
+    + (enemigoPrueba.arma ? enemigoPrueba.arma->statBonus.defensa : 0);
     enemigoPrueba.esJefe = false;
     enemigoPrueba.loot = NULL;
     enemigoPrueba.efecto = NULL;
     enemigoPrueba.habilidades[0] = skillEnvenenar;
+    enemigoPrueba.habilidades[1] = NULL;
+    enemigoPrueba.habilidades[2] = NULL;
     
     
     comenzarPelea(&jugadorPrueba, &enemigoPrueba/*, NULL*/); // Llama al combate

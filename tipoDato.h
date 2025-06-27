@@ -44,10 +44,10 @@ typedef enum {
 //// STRUCTS
 
 typedef struct {
-    int vidaBonus;
-    int AtaqueBonus;
-    int DefensaBonus;
-} Bonus;
+    int vida;
+    int ataque;
+    int defensa;
+} Stats;
 
 typedef struct {
     int id;
@@ -75,7 +75,7 @@ typedef struct {
     char *descripcion;
     tipoConsumible tipoCons;
     tipoEquipable tipoEquip;
-    Bonus statBonus;
+    Stats statBonus;
     Skill *habilidadAprendida;
     int vidaRecuperada;
     int poder;
