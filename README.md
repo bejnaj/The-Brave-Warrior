@@ -52,7 +52,10 @@ Para compilar escribir en terminal "gcc *.c tdas/*.c -o bravewarrior.exe -lm
 -Huir
 
 ## Menu de inventario (Fuera de combate)
--
--
--
+-Ver todo el inventario
+-Ver objetos usables en combate
+-Ver habilidades aprendidas
+-Aprender habilidades
+-Equipar algun objeto
+-Volver al movimiento en la mazmorra
 
