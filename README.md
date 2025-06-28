@@ -46,4 +46,13 @@ Para compilar escribir en terminal "gcc *.c tdas/*.c -o bravewarrior.exe -lm
 -Derecha.
 -Revisar Inventario (abre menu de inventario).
 
+## Menu de combate 
+-Ataque (basico o habilidad)
+-Inventario (solo lista de items para usar)
+-Huir
+
+## Menu de inventario (Fuera de combate)
+-
+-
+-
 
