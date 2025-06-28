@@ -9,9 +9,9 @@ Bendición,5,2,estado,0,29,1
 Maldecir,5,2,estado,0,28,0
 Blindaje,4,2,estado,0,18,1
 Escudo de Energía,6,2,estado,0,27,1
-Aturdir,4,1,estado,0,12,0
+Aturdir,4,2,estado,0,12,0
 Paralizar,6,2,estado,0,13,0
-Congelar,5,1,estado,0,14,0
+Congelar,5,2,estado,0,14,0
 Inspirar,3,2,estado,0,16,1
 Desmoralizar,3,2,estado,0,17,0
 Fuerza Potenciada,5,2,estado,0,6,1
@@ -20,8 +20,8 @@ Defensa de Hierro,5,2,estado,0,8,1
 Romper Defensa,5,2,estado,0,9,0
 Recuperacion Rápida,4,2,estado,0,23,1
 Desangrar,4,2,estado,0,20,0
-Confundir,4,1,estado,0,24,0
-Somnolencia,4,1,estado,0,25,0
+Confundir,4,2,estado,0,24,0
+Somnolencia,4,2,estado,0,25,0
 Enfurecer,6,2,estado,0,19,1
 Protección Divina,8,2,estado,0,21,1
 Dureza de Piel,5,2,estado,0,8,1

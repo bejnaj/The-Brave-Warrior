@@ -10,9 +10,9 @@ ID,nombre,tipoStatus{vida|daño|defensa|saltarTurno},coste(para saltarTurno),ope
 9,Defensa Rota,defensa,,mult,0.5
 10,Escudo Temporal,defensa,,suma,20
 11,Desprotegido,defensa,,suma,-15
-12,Aturdido,saltarTurno,1,,1
-13,Paralizado,saltarTurno,2,,1
-14,Congelado,saltarTurno,1,,1
+12,Aturdido,saltarTurno,2,,2
+13,Paralizado,saltarTurno,2,,2
+14,Congelado,saltarTurno,2,,2
 15,Quemadura,vida,,suma,-5
 16,Inspirado,daño,,suma,10
 17,Desmoralizado,daño,,suma,-10
@@ -22,8 +22,8 @@ ID,nombre,tipoStatus{vida|daño|defensa|saltarTurno},coste(para saltarTurno),ope
 21,Protección Divina,defensa,,mult,3
 22,Envenenamiento Grave,vida,,suma,-25
 23,Recuperación Rápida,vida,,suma,20
-24,Confundido,saltarTurno,1,,1
-25,Dormido,saltarTurno,3,,1
+24,Confundido,saltarTurno,2,,2
+25,Dormido,saltarTurno,3,,3
 26,Impenetrable,defensa,,mult,3
 27,Escudo de Energía,defensa,,suma,50
 28,Maldito,vida,,suma,-20

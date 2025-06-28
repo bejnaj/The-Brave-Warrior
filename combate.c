@@ -12,7 +12,7 @@ const char* tipoToStr(tipoStatus t) {
     switch (t) {
         case dano: return "daño";
         case defensa: return "defensa";
-        case saltarTurno: return "pierdes turno";
+        case saltarTurno: return "turnos perdidos";
         case vida: return "vida";
     }
 }
@@ -509,7 +509,7 @@ int comenzarPelea(Jugador *P, Enemy *E/*, Map *status*/) {
             P->efecto->duracion--;
         }
         if(P->efecto!=NULL&&(P->efecto->tipo == saltarTurno)){
-            P->efecto->duracion--;
+            P->efecto->cantidad--;
             printb("Estás %s,",P->efecto->nombre);
             Sleep(500);
             printb("¡PIERDES EL TURNO!\n");
@@ -587,15 +587,17 @@ int comenzarPelea(Jugador *P, Enemy *E/*, Map *status*/) {
                 E->efecto->duracion--;
             }
             if(E->efecto!=NULL&&(E->efecto->tipo == saltarTurno)){
-                E->efecto->duracion--;
+                E->efecto->cantidad--;
                 printb("%s está %s,",E->nombre,E->efecto->nombre);
                 Sleep(500);
                 printb("¡PIERDE EL TURNO!\n");
                 Sleep(1500);
+                printearBarras(P,E);
             }else{
                 printb("Turno del enemigo\n");
                 Sleep(1000);
                 int accionEnemigo = randomRint(0,1);
+                if (E->efecto&&(((E->efecto->cantidad>0&&E->efecto->op == suma)||(E->efecto->cantidad>=1&&E->efecto->op == multiplicacion)))) accionEnemigo = 1;
                     if(accionEnemigo){ // combo en el hocico
                     printb("El enemigo ha decidido darte un combo en el hocico\n");
                     Sleep(1000);
@@ -608,10 +610,9 @@ int comenzarPelea(Jugador *P, Enemy *E/*, Map *status*/) {
                     printf("Turno del enemigo\n");
                     if (ataque>(Ataque(E->ataque,P->defensa,P->vida) * 1.2)){
                         printb("GOLPE CRÍTICO!!\n%s ha recibido %d puntos de daño!\n",P->nombre,ataque);
-                        Sleep(1000);
+                        
                     } else {
                         printb("\n%s ha recibido %d puntos de daño!\n",P->nombre,ataque);
-                        Sleep(1000);
                     }
                     Sleep(2000);
                     borrarLineas(3);
@@ -676,6 +677,38 @@ int comenzarPelea(Jugador *P, Enemy *E/*, Map *status*/) {
 int main(){
     init_random();
     SetConsoleOutputCP(65001); // Consola en UTF-8
+    //STATUS
+
+    //18,Blindaje,defensa,,suma,30
+    Status *statusBlindaje = malloc(sizeof(Status));
+    statusBlindaje->id = 18;
+    statusBlindaje->nombre = strdup("Blindaje");
+    statusBlindaje->tipo = defensa;
+    statusBlindaje->op = suma;
+    statusBlindaje->cantidad = 30;
+    statusBlindaje->costeTurnos = 0;
+    statusBlindaje->duracion = 0;
+
+    //6,Fuerza Potenciada,daño,,mult,1.5
+    Status *statusFuerzaPotenciada = malloc(sizeof(Status));
+    statusFuerzaPotenciada->id = 6;
+    statusFuerzaPotenciada->nombre = strdup("Fuerza Potenciada");
+    statusFuerzaPotenciada->tipo = dano;
+    statusFuerzaPotenciada->op = multiplicacion;
+    statusFuerzaPotenciada->cantidad = 1.5;
+    statusFuerzaPotenciada->costeTurnos = 0;
+    statusFuerzaPotenciada->duracion = 0;
+
+    //8,Defensa de Hierro,defensa,,mult,2
+    Status *statusDefensaHierro = malloc(sizeof(Status));
+    statusDefensaHierro->id = 8;
+    statusDefensaHierro->nombre = strdup("Defensa de Hierro");
+    statusDefensaHierro->tipo = defensa;
+    statusDefensaHierro->op = multiplicacion;
+    statusDefensaHierro->cantidad = 2;
+    statusDefensaHierro->costeTurnos = 0;
+    statusDefensaHierro->duracion = 0;
+
     //16,Inspirado,daño,,suma,10
     Status *statusInspirado = malloc(sizeof(Status));
     statusInspirado->id = 16;
@@ -684,7 +717,7 @@ int main(){
     statusInspirado->op = suma;
     statusInspirado->cantidad = 10;
     statusInspirado->costeTurnos = 0;
-    statusInspirado->duracion = 3;
+    statusInspirado->duracion = 0;
 
     //14,Congelado,saltarTurno,1,,1
     Status *statusCongelado = malloc(sizeof(Status));
@@ -692,9 +725,9 @@ int main(){
     statusCongelado->nombre = strdup("Congelado");
     statusCongelado->tipo = saltarTurno;
     statusCongelado->op = suma; // o el valor que corresponda si tienes otro enum para "sin operación"
-    statusCongelado->cantidad = 1;
-    statusCongelado->costeTurnos = 1;
-    statusCongelado->duracion = 1;
+    statusCongelado->cantidad = 2;
+    statusCongelado->costeTurnos = 2;
+    statusCongelado->duracion = 0;
 
     //2,Regeneración,vida,,suma,10
     Status *statusRegeneracion = malloc(sizeof(Status));
@@ -704,7 +737,7 @@ int main(){
     statusRegeneracion->op = suma;
     statusRegeneracion->cantidad = 10;
     statusRegeneracion->costeTurnos = 0;
-    statusRegeneracion->duracion = 3;
+    statusRegeneracion->duracion = 0;
 
     //1,Envenenado,vida,,suma,-10
     Status *statusEnvenenado = malloc(sizeof(Status));
@@ -714,14 +747,49 @@ int main(){
     statusEnvenenado->op = suma;
     statusEnvenenado->cantidad = -10;
     statusEnvenenado->costeTurnos = 0;
-    statusEnvenenado->duracion = 3;
+    statusEnvenenado->duracion = 0;
+    
+    //SKILLS
+
+    //Defensa de Hierro,5,2,estado,0,8,1
+    Skill *skillDefensaHierro = malloc(sizeof(Skill));
+    skillDefensaHierro->nombre = strdup("Defensa de Hierro");
+    skillDefensaHierro->cooldown = 5;
+    skillDefensaHierro->cooldownActual = 0;
+    skillDefensaHierro->duracion = 3;
+    skillDefensaHierro->tipo = estado;
+    skillDefensaHierro->vidaCurada = 0;
+    skillDefensaHierro->estado = copiarStatus(statusDefensaHierro); // id 8
+    skillDefensaHierro->hacia = 1; // propio
+
+    //Fuerza Potenciada,5,2,estado,0,6,1
+    Skill *skillFuerzaPotenciada = malloc(sizeof(Skill));
+    skillFuerzaPotenciada->nombre = strdup("Fuerza Potenciada");
+    skillFuerzaPotenciada->cooldown = 5;
+    skillFuerzaPotenciada->cooldownActual = 0;
+    skillFuerzaPotenciada->duracion = 3;
+    skillFuerzaPotenciada->tipo = estado;
+    skillFuerzaPotenciada->vidaCurada = 0;
+    skillFuerzaPotenciada->estado = copiarStatus(statusFuerzaPotenciada); // id 6
+    skillFuerzaPotenciada->hacia = 1; // propio
+
+    //Blindaje,4,2,estado,0,18,1
+    Skill *skillBlindaje = malloc(sizeof(Skill));
+    skillBlindaje->nombre = strdup("Blindaje");
+    skillBlindaje->cooldown = 4;
+    skillBlindaje->cooldownActual = 0;
+    skillBlindaje->duracion = 3;
+    skillBlindaje->tipo = estado;
+    skillBlindaje->vidaCurada = 0;
+    skillBlindaje->estado = copiarStatus(statusBlindaje); // id 18
+    skillBlindaje->hacia = 1; // propio
 
     //Congelar,5,1,estado,0,14,0
     Skill *skillCongelar = malloc(sizeof(Skill));
     skillCongelar->nombre = strdup("Congelar");
     skillCongelar->cooldown = 5;
     skillCongelar->cooldownActual = 0;
-    skillCongelar->duracion = 1;
+    skillCongelar->duracion = 2;
     skillCongelar->tipo = estado;
     skillCongelar->vidaCurada = 0;
     skillCongelar->estado = copiarStatus(statusCongelado); // llama al status id 14
@@ -813,7 +881,7 @@ int main(){
     + (jugadorPrueba.armadura ? jugadorPrueba.armadura->statBonus.defensa : 0)
     + (jugadorPrueba.arma ? jugadorPrueba.arma->statBonus.defensa : 0);
     jugadorPrueba.inventario = L;
-    jugadorPrueba.habilidades[0] = copiarSkill(skillCuracionMayor);
+    jugadorPrueba.habilidades[0] = copiarSkill(skillDefensaHierro);
     jugadorPrueba.habilidades[1] = copiarSkill(skillCongelar)/*bolaDeFuego*/; // o puedes poner otra skill si quieres
     jugadorPrueba.efecto = NULL;
     jugadorPrueba.posicion.posX = 0;
@@ -829,8 +897,8 @@ int main(){
     enemigoPrueba.loot = NULL;
     enemigoPrueba.efecto = NULL;
     enemigoPrueba.habilidades[0] = copiarSkill(skillCongelar);
-    enemigoPrueba.habilidades[1] = copiarSkill(skillCuracionMayor);
-    enemigoPrueba.habilidades[2] = copiarSkill(skillInspirar);
+    enemigoPrueba.habilidades[1] = NULL/*copiarSkill(skillFuerzaPotenciada)*/;
+    enemigoPrueba.habilidades[2] = NULL/*copiarSkill(skillInspirar)*/;
     
     
     comenzarPelea(&jugadorPrueba, &enemigoPrueba/*, NULL*/); // Llama al combate
