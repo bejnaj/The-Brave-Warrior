@@ -16,9 +16,18 @@ En el sistema de combate, existe la pequeña probabilidad de que haya un problem
 # Instalacion
 Descargar el archivo zip o cargarlo de github
 Abrir en VSC
-Compilar en una terminal Git Bash, escribir en esta "gcc *.c tdas/*.c -o bravewarrior.exe -lm
-./bravewarrior.exe" en Windows o "gcc *.c tdas/*.c -o bravewarrior -lm
-./bravewarrior" en Linux/MacOS.
+- En la terminal, compila el programa con el siguiente comando:
+        
+        ```bash
+        gcc *.c tdas/*.c -o bravewarrior
+        ```
+        
+**Ejecuta el programa**
+    - Una vez compilado, puedes ejecutar la aplicación con:
+        
+        ```
+        ./bravewarrior
+        ```
 
 # Funcionalidades
 
