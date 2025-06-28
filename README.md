@@ -59,3 +59,32 @@ Para compilar escribir en terminal "gcc *.c tdas/*.c -o bravewarrior.exe -lm
 -Equipar algun objeto
 -Volver al movimiento en la mazmorra
 
+
+### Bastian Contreras:
+- Hizo la gran mayoria del sistema de combate.
+- Diseño inicial de la interfaz de usuario.
+- Diseño y redacción del README.
+- Creación de archivos csv junto a sus datos.
+- Documentación y comentarios en el código.
+- **Evaluacion grupal**: 10 (Aporte excelente).
+
+### Sergio Codoceo:
+- Diseñó la lectura y parseo de los archivo CSV para que sean correctamente leidos.
+- Apoyo en otros sectores (combate y debugging).
+- Documentación y comentarios en el código.
+- Diseño y redacción del README.
+- Creación de archivos csv junto a sus datos.
+- **Evaluacion grupal**: 8 (Aporte bueno).
+
+### Benjamin Torres:
+- Implementó funciones de lista (list_get , list_find y list_size).
+- Diseño la primera version de generacion de loot, ademas de algunos ajustes pequeños en algunas versiones.
+- **Evaluacion grupal**: 3 (Aporte pésimo).
+
+### Andres Cardenas:
+- Aporte en la gestión de inventario dentro del sistema de combate.
+- Implementó y modificó los tdas para que fueran utilizables en la aplicacion.
+- Implementó funciones relacionadas fuera del combate , incluida main.
+- Documentación y comentarios en el código.
+- Implementación de la gestión de inventario para el Jugador.
+- **Evaluacion grupal**: 10 (Aporte excelente).
