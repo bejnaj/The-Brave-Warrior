@@ -63,7 +63,7 @@ multiPar *buscarMultiMapa(multiMapa *map, int key) {
     int pos = multiHash(key, map -> capacity);
     multiPar *par = map->pares[pos];
 
-    if (par != NULL && (par -> key == key)) {
+    if (par != NULL) {
         map -> current = pos;
         return par;
     }
