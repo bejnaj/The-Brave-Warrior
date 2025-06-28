@@ -15,6 +15,7 @@
 #include "miscelaneo.h"
 #include "combate.h"
 
+void imprimirListaEnemigos(List *enemigos);
 
 //// PROTOTIPO DE FUNCIONES
 
@@ -78,15 +79,24 @@ void interfazDeTesoro(Jugador *, Item *);
 
 Enemy *clonarEnemigo(List *L, float mult, bool esJefe) {
     Enemy *actual;
-    if (esJefe == false) {
+    if (esJefe) {
+        do {
+            printf("%d\n", list_size(L));
+            imprimirListaEnemigos(L);
+            int pos = randomRint(0, list_size(L)); // Se elige una posicion random de la lista
+            actual = list_get(L, pos);
+ 
+        } while (actual == NULL || actual->esJefe == false);
+    }
+    else {
         do {
             int pos = randomRint(0, list_size(L)); // Se elige una posicion random de la lista
             actual = list_get(L, pos);
  
         } while (actual == NULL || actual->esJefe == true);
     }
-    esJefe ? puts("si") : puts("no");
     if (actual == NULL) return NULL;
+    puts(actual -> nombre);
     Enemy *E = malloc(sizeof(Enemy));
     if (actual->nombre == NULL) {
         printf("Error: enemigo sin nombre\n");
@@ -906,13 +916,17 @@ int main() {
     SetConsoleCP(CP_UTF8);
     init_random();
 
+
+
     // Proceso de lectura de datos
     List *listaJefes = list_create();
     HashMap *mapaStatus = leer_status("data/Status.csv");
     List *listaSkills = leer_skills("data/Skills.csv", mapaStatus);
     multiMapa *mapaItems = leer_items("data/Items.csv", listaSkills);
     List *listaEnemigos = leer_Enemies("data/Enemies.csv", listaSkills, listaJefes);
+    imprimirListaEnemigos(listaJefes);
     elGuerrero();
+    Sleep(2000);
     printf("Bienvenido a la aventura del Guerrero más Bravo que hayas conocido\n");
     printf("Menú Principal Beta\n");
     printf("Elige una opción:\n1) Jugar\n2) Cómo jugar\n3) Salir\n");
