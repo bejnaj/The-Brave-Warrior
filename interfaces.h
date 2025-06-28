@@ -10,4 +10,7 @@ void limpiarLineas(int lineas);
 //mensaje inicial del juego
 void interfazComienzo(char*);
 
+// Como jugar
+void comoJugar();
+
 #endif // INTERFACES_H

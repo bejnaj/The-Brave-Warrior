@@ -65,17 +65,17 @@ void muestrorra(){
     printf("\n\n\n\n");
 }
 
-void comoJugar(){
+void comoJugar() {
     muestrorra();
     printcv(30,"¿Cómo jugar The Brave Warrior?\n");
     Sleep(500);
     printb("\nTe preguntarás.");
     Sleep(1000);
     muestrorra();
-    printb("Primero lo primero:");Sleep(500);printb("Un poco de contexto sobre el juego para familiarizarte, ");Sleep(200);printb("No?");
+    printb("Primero lo primero:");Sleep(500);printb("Un poco de contexto sobre el juego para familiarizarte, ");Sleep(1000);printb("No?");Sleep(400);
     muestrorra();printcv(40,"Eres un guerrero perdido, en un mundo bizarro y desconocido, donde el único recuerdo que tienes de tu vida es tu propio nombre.\n");
     Sleep(200);printcv(40,"Pero de repente escuchas una voz, alguien que te llama en la lejanía.\n");Sleep(200);
-    printcv(40,"Y lo único que pasa por tu mente es la forma de poder alcanzarla.\n\n");Sleep(200);printcv(40,"La Valentía de tu ser quema tu interior.");Sleep(250); printcv(40,"Así nace The Brave Warrior.");
+    printcv(40,"Y lo único que pasa por tu mente es la forma de poder alcanzarla.\n\n");Sleep(200);printcv(40,"La Valentía de tu ser quema tu interior. ");Sleep(250); printcv(40,"Así nace The Brave Warrior.");
     Sleep(2000);printb("\nCachaste?");Sleep(200);printb(" medio lore enigmático pa un juego de cmd si.");
     Sleep(100);printb("Pero es para darle emoción po,");Sleep(200);printb(" al menos el juego es livianito y podi jugarlo cuando quieras.");
     Sleep(1500);printb("Voy a suponer que leiste todo ya");Sleep(1500);
@@ -85,7 +85,7 @@ void comoJugar(){
     printb("\n\nBueno, continuamos..");Sleep(1000);
     muestrorra();printcv(30,"El sistema de combate consta de 2 partes, tu daño y tu defensa.");Sleep(200);printcv(30,"\nObviamente incluyendo la vida del personaje.\n");
     Sleep(200);printcv(30,"Durante el combate, habrá algo llamado ¨Vida Teória¨ del personaje.");Sleep(100);printcv(30," Que basicamente es la suma de la Vida del personaje y su Defensa.");Sleep(100);printcv(30,"\nY digo personaje, porque este sistema aplica tanto para el jugador como al enemigo.");
-    Sleep(100);printcv(30,"Sabi, mucha palabrería, mejor te muestro todo rápido de una y te haces una idea de como funciona.");Sleep(1000);
+    Sleep(100);printcv(30,"\nSabi, mucha palabrería, mejor te muestro todo rápido de una y te haces una idea de como funciona.");Sleep(1000);
     muestrorra();printcv(30,"El daño que un personaje recibe será el %% de daño que recibiría la ¨Vida Teórica¨ del mismo.\n\nEjemplo:");Sleep(200);
     printb("Tienes 10 de vida, pero 90 de defensa. Eso es 100 de ¨Vida Teórica¨.\n\nSí recibes 20 puntos de vida, ese valor se restará a tu ¨Vida Teórica¨ y se calculará cuando %% se le quitó.\n\n");Sleep(200);
     printb("En este ejemplo, se le quitó el 20%% a la Vida Teórica.");
@@ -94,5 +94,5 @@ void comoJugar(){
     Sleep(200);printb("Te vas a estar movilizando alrededor de una mazmorra de 5X5 salas, consiguiendo objetos, encontrando enemigos, y finalmente enfrentandote al Jefe del piso. Tras vencer a este pasarás al siguiente piso.");Sleep(500);printb(" Ah y también puedes subir de nivel según una cantidad de enemigos derrotados");Sleep(100);
     printb("Lo que te beneficiará en tus estadísticas de vida, daño y defensa de forma progresiva.");Sleep(200);printb("Por ende, no intentes escaparte todo el rato, o perderás experiencia.");Sleep(2000);
     Sleep(100);muestrorra();printb("Y eso sería basicamente toda la guía del juego, ");Sleep(100);printb("Es bastante instintivo y facil de seguir, siempre y cuando lo ejecutes en cmd para poder ver todas las características del juego sin ningun problema de carácteres");Sleep(2000);
-    printb("Eso es todo! Buena suerte Guerrero Bravo!"); Sleep(1000);
+    printb("Eso es todo! Buena suerte Guerrero Bravo!\n"); Sleep(1000);
 }
