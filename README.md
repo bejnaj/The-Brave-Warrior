@@ -13,7 +13,10 @@ En Linux/macOS: funciona sin problemas.
 
 En el sistema de combate, existe la pequeña probabilidad de que haya un problema con el ingreso de opciones. Por ejemplo que se seleccione automaticamente 1) en el primer menú y que automáticamente te mande al menú de elegir una opción de ataque.
 
-Para compilar escribir en terminal "gcc *.c tdas/*.c -o bravewarrior.exe -lm
+# Instalacion
+Descargar el archivo zip o cargarlo de github
+Abrir en VSC
+Compilar en una terminal Git Bash, escribir en esta "gcc *.c tdas/*.c -o bravewarrior.exe -lm
 ./bravewarrior.exe" en Windows o "gcc *.c tdas/*.c -o bravewarrior -lm
 ./bravewarrior" en Linux/MacOS.
 
