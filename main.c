@@ -156,8 +156,8 @@ Item *obtenerItem(multiMapa *mapaItems, Jugador *P) {
 void asignarLootAleatorio(Jugador *P, Enemy *enemigo, multiMapa *mapaItems) {
     if (!enemigo || !mapaItems || mapaItems -> size == 0) return;
 
-    int chance = randomRint(1, 10); // genera numero aleatorio entre 1 y 100 para determinar si no deja loot (30% probabilidad de tener loot)
-    if (chance > 3) {
+    int chance = randomRint(1, 2); // genera numero aleatorio entre 1 y 2 para determinar si no deja loot (50% probabilidad de tener loot)
+    if (chance == 1) {
         enemigo->loot = NULL; // no deja loot
         return;
     }
@@ -259,20 +259,28 @@ void limpiarEstado(Status *S) {
 }
 
 void limpiarHabilidad(Skill *H) {
-    if (H != NULL) {
+    if (H == NULL) return;
+
+    if (H->nombre != NULL) {
         free(H->nombre);
-        if (H->estado != NULL)
-            free(H->estado);
-        free(H);
+        H->nombre = NULL;
     }
+
+    if (H->estado != NULL) {
+        free(H->estado);
+        H->estado = NULL;
+    }
+
+    free(H);
 }
+
 
 void limpiarEnemigo(Enemy *E) {
     if (E == NULL) return;
 
     // Liberar nombre
     free(E->nombre);
-
+    E -> nombre = NULL;
    
     if (E->efecto != NULL) { // Liberar el efecto
         limpiarEstado(E -> efecto);
@@ -323,7 +331,8 @@ void limpiarPiso(Escenario ***S) {
 }
 
 void limpiarJuego(List *listaJefes, List *listaEnemigos, HashMap *mapaStatus, multiMapa *mapaItems, Jugador *P, Escenario **S) { // Limpia los datos del juego y cierra la aplicacion
-    limpiarPiso(&S);
+    if (S)
+        limpiarPiso(&S);
     // Limpiado de enemigos
     for (Enemy *actual = list_popFront(listaJefes) ; actual != NULL ; actual = list_popFront(listaJefes)) {
         limpiarEnemigo(actual);
@@ -331,6 +340,7 @@ void limpiarJuego(List *listaJefes, List *listaEnemigos, HashMap *mapaStatus, mu
     for (Enemy *actual = list_popFront(listaEnemigos) ; actual != NULL ; actual = list_popFront(listaEnemigos)) {
         limpiarEnemigo(actual);
     }
+    
     
 }
 
