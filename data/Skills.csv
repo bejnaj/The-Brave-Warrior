@@ -1,6 +1,6 @@
 nombre,cooldown,duracion,tipoSkill{curacion|estado},vidaCurada,estados(ID),hacia{1(Propio)|0(Enemigo)}
-Curación Menor,2,0,curacion,20,,1
-Curación Mayor,4,0,curacion,50,,1
+Curacion Menor,2,0,curacion,20,,1
+Curacion Mayor,4,0,curacion,50,,1
 Regeneración,3,3,estado,0,2,1
 Envenenar,3,3,estado,0,1,0
 Quemar,3,2,estado,0,15,0
@@ -18,16 +18,16 @@ Fuerza Potenciada,5,2,estado,0,6,1
 Debilitar,5,2,estado,0,7,0
 Defensa de Hierro,5,2,estado,0,8,1
 Romper Defensa,5,2,estado,0,9,0
-Recuperación Rápida,4,2,estado,0,23,1
+Recuperacion Rápida,4,2,estado,0,23,1
 Desangrar,4,2,estado,0,20,0
 Confundir,4,1,estado,0,24,0
 Somnolencia,4,1,estado,0,25,0
 Enfurecer,6,2,estado,0,19,1
 Protección Divina,8,2,estado,0,21,1
 Dureza de Piel,5,2,estado,0,8,1
-Bola de Fuego,5,0,curación,-100,,0
+Bola de Fuego,5,0,curación,-90,,0
 Golpe Severo,2,1,Curacion,-30,0,0
 Puchas,4,0,curacion,-30,0,0
 Recorcholis,4,0,curacion,100,0,1
 Recrestas,4,3,estado,0,29,1
-Explotar,5,0,curacion,-100,0,0
+Explotar,5,0,curacion,-90,0,0

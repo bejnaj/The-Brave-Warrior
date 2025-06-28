@@ -147,6 +147,7 @@ void borrarLineas(int x) {
 }
 
 Skill *copiaSkill(Skill *elem) {
+    puts(elem -> nombre);
     Skill *copia = malloc(sizeof(Skill));
     copia -> nombre = elem -> nombre;
     copia -> tipo = elem -> tipo;

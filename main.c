@@ -81,9 +81,11 @@ Enemy *clonarEnemigo(List *L, float mult, bool esJefe) {
     if (esJefe == false) {
         do {
             int pos = randomRint(0, list_size(L)); // Se elige una posicion random de la lista
-            actual = list_get(L, pos);         
+            actual = list_get(L, pos);
+ 
         } while (actual == NULL || actual->esJefe == true);
     }
+    esJefe ? puts("si") : puts("no");
     if (actual == NULL) return NULL;
     Enemy *E = malloc(sizeof(Enemy));
     if (actual->nombre == NULL) {
@@ -97,9 +99,9 @@ Enemy *clonarEnemigo(List *L, float mult, bool esJefe) {
     E -> ataque = actual -> ataque * mult;
     E -> defensa = actual -> defensa * mult;
     E -> loot = NULL;
-    E -> arma = NULL;
     E -> esJefe = actual -> esJefe;
     E -> efecto = actual -> efecto;
+
     for (int i = 0 ; i < 3 ; i++) {
         if (actual -> habilidades[i] != NULL)
             E -> habilidades[i] = copiaSkill(actual -> habilidades[i]);
@@ -207,8 +209,6 @@ Escenario **crearMatriz(multiMapa *mapaItems, List *listaEnemigos, Jugador *P, L
     if (matriz[indX][indY].enemigo != NULL) { // Limpiar datos del enemigo previo si existia
          free(matriz[indX][indY].enemigo); 
     }
-    puts("omero");
-    Sleep(500);
     matriz[indX][indY].enemigo = clonarEnemigo(listaJefes, *mult, true);
     matriz[indX][indY].objeto = NULL;
 
@@ -231,7 +231,6 @@ void limpiarEstado(Status *S) {
     free(S -> nombre);
     free(S);
 }
-
 
 void limpiarEnemigo(Enemy *E) { 
     free(E -> nombre); //Limpia el nombre guardado dinamicamente
@@ -858,56 +857,44 @@ void interfazDeTesoro(Jugador *P, Item *I) {
 
 void imprimirListaEnemigos(List *enemigos) {
     if (enemigos == NULL) {
-        printf("La lista de enemigos está vacía o no inicializada.\n");
+        printf("Lista de enemigos nula.\n");
         return;
     }
 
-    Enemy *enemigo = (Enemy *)list_first(enemigos);
     int num = 1;
-    
-    while (enemigo != NULL) {
+    for (Enemy *enemigo = list_first(enemigos); enemigo != NULL; enemigo = list_next(enemigos)) {
         printf("========= Enemigo %d =========\n", num++);
-        printf("Nombre: %s\n", enemigo->nombre ? enemigo->nombre : "(nombre NULL)");
+
+        if (!enemigo) {
+            printf("Error: enemigo nulo.\n");
+            continue;
+        }
+
+        printf("Nombre: %s\n", enemigo->nombre ? enemigo->nombre : "(sin nombre)");
         printf("Vida: %d/%d\n", enemigo->vidaActual, enemigo->vida);
         printf("Ataque: %d\n", enemigo->ataque);
         printf("Defensa: %d\n", enemigo->defensa);
         printf("Tipo: %s\n", enemigo->esJefe ? "JEFE" : "Normal");
 
-        // Loot
-        if (enemigo->loot != NULL && enemigo->loot->nombre != NULL) {
+        if (enemigo->loot && enemigo->loot->nombre)
             printf("Loot: %s\n", enemigo->loot->nombre);
-        } else {
+        else
             printf("Loot: Ninguno\n");
-        }
 
-        // Arma equipada
-        if (enemigo->arma != NULL && enemigo->arma->nombre != NULL) {
-            printf("Arma: %s\n", enemigo->arma->nombre);
-        } else {
-            printf("Arma: Ninguna\n");
-        }
-
-        // Efecto de estado
-        if (enemigo->efecto != NULL && enemigo->efecto->nombre != NULL) {
-            printf("Estado aplicado: %s (duración: %d turnos)\n",
-                   enemigo->efecto->nombre, enemigo->efecto->duracion);
-        } else {
+        if (enemigo->efecto && enemigo->efecto->nombre)
+            printf("Estado aplicado: %s (duración: %d)\n", enemigo->efecto->nombre, enemigo->efecto->duracion);
+        else
             printf("Estado aplicado: Ninguno\n");
-        }
 
-        // Habilidades
         printf("Habilidades:\n");
         for (int i = 0; i < 3; i++) {
-            if (enemigo->habilidades[i] != NULL && enemigo->habilidades[i]->nombre != NULL) {
+            if (enemigo->habilidades[i] && enemigo->habilidades[i]->nombre)
                 printf("  - %s\n", enemigo->habilidades[i]->nombre);
-            } else {
+            else
                 printf("  - (vacío)\n");
-            }
         }
 
         printf("=============================\n\n");
-
-        enemigo = (Enemy *)list_next(enemigos);
     }
 }
 
@@ -925,15 +912,13 @@ int main() {
     List *listaSkills = leer_skills("data/Skills.csv", mapaStatus);
     multiMapa *mapaItems = leer_items("data/Items.csv", listaSkills);
     List *listaEnemigos = leer_Enemies("data/Enemies.csv", listaSkills, listaJefes);
-    imprimirListaEnemigos(listaEnemigos);
     elGuerrero();
     printf("Bienvenido a la aventura del Guerrero más Bravo que hayas conocido\n");
     printf("Menú Principal Beta\n");
     printf("Elige una opción:\n1) Jugar\n2) Cómo jugar\n3) Salir\n");
     int coso;
     verificarOpcionConBorrado(&coso, 3);
-    switch (coso)
-    {
+    switch (coso) {
     case 1:{
         limpiarPantalla();
         printf("\n\nIngresa el nombre de tu guerrero:");
@@ -958,6 +943,6 @@ int main() {
         break;
     }
     return 0;
-}
+    }
 }
 

@@ -193,23 +193,27 @@ List *leer_Enemies(char *str, List *listaSkills, List *listaJefes) {
     Actual->nombre = strdup(campos[0]);
     sscanf(campos[1], "%d;%d;%d", &Actual->vida, &Actual->ataque, &Actual->defensa);
     Actual -> vidaActual = Actual -> vida;
+    Actual -> loot = NULL;
+    Actual -> efecto = NULL;
     Actual->esJefe = (strcmp(campos[3], "True") == 0) ? true : false;
     // Procesa habilidades (puede haber hasta 3 separadas por ';')
     if (strcmp(campos[4], "NULL") != 0) {
       List* L = split_string(campos[4], ";");
       int i = 0;
-      for (char *subcampoActual = list_first(L) ; subcampoActual != NULL && i < 3 ; subcampoActual = list_first(L)) { // parsea y copia cada habilidad
+      for (char *subcampoActual = list_popFront(L) ; subcampoActual != NULL && i < 3 ; subcampoActual = list_popFront(L)) { // parsea y copia cada habilidad
         Skill *aux = (Skill *)list_find(listaSkills, subcampoActual, cmpSkill);
         Actual -> habilidades[i] = aux;
-        free(list_popFront(L));
+        free(subcampoActual);
         i++;
       }
     }
     // Agrega el enemigo a la lista
-    if (Actual -> esJefe)
-      list_pushFront(listaJefes, Actual);
-    else
-      list_pushFront(listaEnemigos, Actual);
+    if (Actual -> esJefe) {
+      list_pushBack(listaJefes, Actual);
+    } else {
+      list_pushBack(listaEnemigos, Actual);
+    }
+
   }
   fclose(archivo);
   return listaEnemigos;

@@ -19,17 +19,17 @@ Bandido,80;20;8,NULL,False,Herida Grave
 Bandido Lider,140;30;12,NULL,False,Herida Grave
 Murcielago,30;7;2,NULL,False,Desangrar
 Dragon sin alas ni piernas,100;20;10,NULL,False,Desangrar
-Murcielago Vampiro,80;18;6,NULL,False,Curación Menor
+Murcielago Vampiro,80;18;6,NULL,False,Curacion Menor
 Creeper,90;15;5,NULL,False,Explotar
-Dracula,220;35;18,NULL,True,Desangrar;Curación Mayor;Congelar
-Alucard hijo de Dracula,500;50;25,NULL,True,Curación Mayor;Congelar;Maldecir
+Dracula,220;35;18,NULL,True,Desangrar;Curacion Mayor;Congelar
+Alucard hijo de Dracula,500;50;25,NULL,True,Curacion Mayor;Congelar;Maldecir
 Lobo,70;16;7,NULL,False,Desangrar
 Lobo Alfa,150;28;14,NULL,False,Desangrar
 Mago Oscuro,90;22;8,NULL,False,Maldecir
-Mago Maestro,200;35;15,NULL,True,Maldecir;Bola de Fuego;Recuperación Rápida
+Mago Maestro,200;35;15,NULL,True,Maldecir;Bola de Fuego;Recuperacion Rápida
 Zombie,40;25;0,NULL,False,Debilitar
 Zombie con Casco,90;25;0,NULL,False,Debilitar
-Gargantuar,220;30;10,NULL,True,Blindaje;Dessangrar;Debilitar
+Gargantuar,220;30;10,NULL,True,Blindaje;Desangrar;Debilitar
 Gigante,300;5;5,NULL,False,Blindaje
 Gigante Noble,350;10;10,NULL,False,Blindaje
 Completo Italiano (De italia),100;0;5,NULL,False,Enfurecer
