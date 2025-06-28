@@ -43,7 +43,7 @@ void limpiarEnemigo(Enemy *E); // Limpia los elementos de un enemigo
 void borrarLibro(List *L, char *str); // Borra la primera ocurrencia de un libro en una lista
 void borrarEquipable(List *L, char *nombreEquip); // Borra la primera ocurrencia de un equipable en una lista
 void limpiarPiso(Escenario ***S); // Obtiene un puntero a una matriz de Escenario (Escenario ***), limpia todos sus elementos (Escenario contiene punteros y datos estaticos, por lo que no es necesario limpiar mas adentro) y luego marca el dato como NULL
-
+void limpiarJuego(List *listaJefes, List *listaEnemeigos, HashMap *mapaStatus, multiMapa *mapaItems, Jugador *P, Escenario **S); // Limpia los datos del juego y cierra la aplicacion
 
 //// MOVIMIENTO EN LA MAZMORRA
 void movimientoMazmorra(Jugador *P, Escenario **S); // Funcion encargada de mover al jugador en la direccion deseada
@@ -74,6 +74,7 @@ void recalcularStats(Jugador *P); // Recalcula las stats principales del jugador
 
 //// INTERFAZ DE TESORO
 void interfazDeTesoro(Jugador *, Item *);
+void mostrarInfoItem(Item *item);
 
 //// CLONADO
 
@@ -81,22 +82,19 @@ Enemy *clonarEnemigo(List *L, float mult, bool esJefe) {
     Enemy *actual;
     if (esJefe) {
         do {
-            printf("%d\n", list_size(L));
-            imprimirListaEnemigos(L);
-            int pos = randomRint(0, list_size(L)); // Se elige una posicion random de la lista
+            int pos = randomRint(0, list_size(L) - 1); // Se elige una posicion random de la lista
             actual = list_get(L, pos);
  
         } while (actual == NULL || actual->esJefe == false);
     }
     else {
         do {
-            int pos = randomRint(0, list_size(L)); // Se elige una posicion random de la lista
+            int pos = randomRint(0, list_size(L) - 1); // Se elige una posicion random de la lista
             actual = list_get(L, pos);
  
         } while (actual == NULL || actual->esJefe == true);
     }
     if (actual == NULL) return NULL;
-    puts(actual -> nombre);
     Enemy *E = malloc(sizeof(Enemy));
     if (actual->nombre == NULL) {
         printf("Error: enemigo sin nombre\n");
@@ -122,14 +120,33 @@ Enemy *clonarEnemigo(List *L, float mult, bool esJefe) {
 }
 
 Item *obtenerItem(multiMapa *mapaItems, Jugador *P) {
-    int poderAleatorio = randomRint(1, powerIndexPlayer(P)); // Indica la posicion aleatoria entre el rango 1 y el poder maximo que puede obtener el jugador actualmente
-    multiPar *actual = buscarMultiMapa(mapaItems, poderAleatorio); // Busca si existen objetos en ese poder
-    if(actual == NULL) {
-        actual = anteriorMultiMapa(mapaItems);
-        if (actual == NULL) return NULL; // No deberia entrar nunca aqui ya que existen items poder 1
+    if (!mapaItems || !P) return NULL;
+
+    int poderMax = powerIndexPlayer(P);
+    if (poderMax < 1) poderMax = 1;
+
+    int poderAleatorio = randomRint(1, poderMax);
+
+    multiPar *actual = buscarMultiMapa(mapaItems, poderAleatorio);
+
+    // Si no hay items exactos con ese poder, buscar hacia abajo el primero que exista
+    while (actual == NULL && poderAleatorio > 1) {
+        poderAleatorio--;
+        actual = buscarMultiMapa(mapaItems, poderAleatorio);
     }
-    List *auxLista = actual -> values; // Obtiene la lista de elementos
-    Item *auxItem = list_get(auxLista, randomRint(0, list_size(auxLista))); // Obtiene un indice aleatorio de la lista de elementos
+
+    // Si no se encontró ningún ítem (muy raro si hay items con poder 1)
+    if (actual == NULL) {
+        return NULL;
+    }
+
+    List *auxLista = actual->values;
+    int tam = list_size(auxLista);
+    if (tam == 0) return NULL; // lista vacía, evitar crash
+
+    int indice = randomRint(0, tam - 1);
+    Item *auxItem = list_get(auxLista, indice);
+
     return auxItem;
 }
 
@@ -152,7 +169,7 @@ void asignarLootAleatorio(Jugador *P, Enemy *enemigo, multiMapa *mapaItems) {
         if (actual == NULL) return;
     }
     List *auxLista = actual -> values; // Obtiene la lista de elementos
-    Item *auxItem = list_get(auxLista, randomRint(0, list_size(auxLista))); // Obtiene un indice aleatorio de la lista de elementos
+    Item *auxItem = list_get(auxLista, randomRint(0, list_size(auxLista) - 1)); // Obtiene un indice aleatorio de la lista de elementos
     enemigo -> loot = auxItem;
     return;
 }
@@ -239,17 +256,37 @@ Escenario **crearMatriz(multiMapa *mapaItems, List *listaEnemigos, Jugador *P, L
 
 void limpiarEstado(Status *S) { 
     free(S -> nombre);
-    free(S);
 }
 
-void limpiarEnemigo(Enemy *E) { 
-    free(E -> nombre); //Limpia el nombre guardado dinamicamente
-    free(E -> loot);
+void limpiarHabilidad(Skill *H) {
+    if (H != NULL) {
+        free(H->nombre);
+        if (H->estado != NULL)
+            free(H->estado);
+        free(H);
+    }
+}
 
-    limpiarEstado(E -> efecto); // Limpia la lista de estados
-    free(E -> efecto);
-    E -> efecto = NULL;
+void limpiarEnemigo(Enemy *E) {
+    if (E == NULL) return;
 
+    // Liberar nombre
+    free(E->nombre);
+
+   
+    if (E->efecto != NULL) { // Liberar el efecto
+        limpiarEstado(E -> efecto);
+    }
+
+    // Liberar las habilidades
+    for (int i = 0; i < 3; i++) {
+        Skill *aux = E->habilidades[i];
+        if ((aux) != NULL) {
+            limpiarHabilidad(aux);
+        }
+    }
+
+    // Liberar la estructura Enemy
     free(E);
 }
 
@@ -277,12 +314,24 @@ void limpiarPiso(Escenario ***S) {
         for (int j = 0 ; j < 5 ; j++) {
             if ((*S)[i][j].enemigo != NULL)
                 limpiarEnemigo((*S)[i][j].enemigo);
-        } 
+        }
         free((*S)[i]);
         (*S)[i] = NULL;
     }
     free(*S);
     *S = NULL;
+}
+
+void limpiarJuego(List *listaJefes, List *listaEnemigos, HashMap *mapaStatus, multiMapa *mapaItems, Jugador *P, Escenario **S) { // Limpia los datos del juego y cierra la aplicacion
+    limpiarPiso(&S);
+    // Limpiado de enemigos
+    for (Enemy *actual = list_popFront(listaJefes) ; actual != NULL ; actual = list_popFront(listaJefes)) {
+        limpiarEnemigo(actual);
+    }
+    for (Enemy *actual = list_popFront(listaEnemigos) ; actual != NULL ; actual = list_popFront(listaEnemigos)) {
+        limpiarEnemigo(actual);
+    }
+    
 }
 
 
@@ -361,10 +410,9 @@ int procesarTurno(Jugador *P, Escenario **S, float *mult) { //Procesa el turno, 
         aux -> visitado = true; // La marca como visitada
         switch (aux -> tipo) { // Revisa el tipo del escenario
             case VACIO:
-                borrarLineas(2);
+                borrarLineas(1);
                 puts("Mala suerte, esta sala esta vacia.");
-                Sleep(500);
-                borrarLineas(1); 
+                Sleep(1500);
                 break;
 
             case ENEMIGO: {
@@ -410,8 +458,6 @@ int procesarTurno(Jugador *P, Escenario **S, float *mult) { //Procesa el turno, 
                     printb("Decidiste no enfrentarte al jefe... pero la mazmorra castiga la cobardía alterando su estructura.\n");
                     Sleep(1000);
                     borrarLineas(1);
-                    
-                    
                 }
                 limpiarPiso(&S);
                 return 1;
@@ -421,6 +467,7 @@ int procesarTurno(Jugador *P, Escenario **S, float *mult) { //Procesa el turno, 
         puts("Ya has vistado este escenario previamente.");
         borrarLineas(7);
     }
+    limpiarPantalla();
     return 2;
 }
 
@@ -432,9 +479,12 @@ void mostrarNivel(Jugador *P, Escenario **E) {
             else {
                 if (E[i][j].visitado)
                     printf("O ");
-                else
-                    printf("X ");
-                   
+                else {
+                    if (E[i][j].tipo == JEFE)
+                        printf("B ");
+                    else
+                        printf("X ");
+                }
             }
         }
         puts("");
@@ -715,6 +765,7 @@ void inventarioJugador(Jugador *P) {
                 break;
             }
             case 6:
+                break;
             return;
         }
     }
@@ -751,10 +802,10 @@ Jugador *inicializarJugador(char *str) { // Inicializa un jugador con el nombre 
     P -> nombre = strdup(str);
     P -> vida = 100;
     P -> statsBase.vida = 100;
-    P -> statsBase.ataque = 20;
+    P -> statsBase.ataque = 2000;
     P -> statsBase.defensa = 10;
     P -> vidaActual = P -> vida;
-    P -> ataque = 20;
+    P -> ataque = 2000;
     P -> defensa = 10;
     P -> nivel = 1;
     P -> arma = NULL;
@@ -865,49 +916,6 @@ void interfazDeTesoro(Jugador *P, Item *I) {
     list_pushBack(P -> inventario, I);
 }
 
-void imprimirListaEnemigos(List *enemigos) {
-    if (enemigos == NULL) {
-        printf("Lista de enemigos nula.\n");
-        return;
-    }
-
-    int num = 1;
-    for (Enemy *enemigo = list_first(enemigos); enemigo != NULL; enemigo = list_next(enemigos)) {
-        printf("========= Enemigo %d =========\n", num++);
-
-        if (!enemigo) {
-            printf("Error: enemigo nulo.\n");
-            continue;
-        }
-
-        printf("Nombre: %s\n", enemigo->nombre ? enemigo->nombre : "(sin nombre)");
-        printf("Vida: %d/%d\n", enemigo->vidaActual, enemigo->vida);
-        printf("Ataque: %d\n", enemigo->ataque);
-        printf("Defensa: %d\n", enemigo->defensa);
-        printf("Tipo: %s\n", enemigo->esJefe ? "JEFE" : "Normal");
-
-        if (enemigo->loot && enemigo->loot->nombre)
-            printf("Loot: %s\n", enemigo->loot->nombre);
-        else
-            printf("Loot: Ninguno\n");
-
-        if (enemigo->efecto && enemigo->efecto->nombre)
-            printf("Estado aplicado: %s (duración: %d)\n", enemigo->efecto->nombre, enemigo->efecto->duracion);
-        else
-            printf("Estado aplicado: Ninguno\n");
-
-        printf("Habilidades:\n");
-        for (int i = 0; i < 3; i++) {
-            if (enemigo->habilidades[i] && enemigo->habilidades[i]->nombre)
-                printf("  - %s\n", enemigo->habilidades[i]->nombre);
-            else
-                printf("  - (vacío)\n");
-        }
-
-        printf("=============================\n\n");
-    }
-}
-
 
 //// MAIN
 
@@ -924,9 +932,7 @@ int main() {
     List *listaSkills = leer_skills("data/Skills.csv", mapaStatus);
     multiMapa *mapaItems = leer_items("data/Items.csv", listaSkills);
     List *listaEnemigos = leer_Enemies("data/Enemies.csv", listaSkills, listaJefes);
-    imprimirListaEnemigos(listaJefes);
     elGuerrero();
-    Sleep(2000);
     printf("Bienvenido a la aventura del Guerrero más Bravo que hayas conocido\n");
     printf("Menú Principal Beta\n");
     printf("Elige una opción:\n1) Jugar\n2) Cómo jugar\n3) Salir\n");
@@ -949,11 +955,20 @@ int main() {
         while(1) {
             mostrarNivel(player, nivelActual);
             movimientoMazmorra(player, nivelActual);
-            procesarTurno(player, nivelActual, &mult);
+            int retorno = procesarTurno(player, nivelActual, &mult);
+            if (retorno == 0) break;
+            else
+                if (retorno == 1) {
+                    nivelActual = crearMatriz(mapaItems, listaEnemigos, player, listaJefes, &mult);
+                }
+            
         }
+        printb("Tu viaje termina aquí, en las sombras de la mazmorra.\n Pero cada caída deja una enseñanza...");
+        limpiarJuego(listaJefes, listaEnemigos, mapaStatus, mapaItems, player, nivelActual);
         break;
     }
     case 3:{
+        limpiarJuego(listaJefes, listaEnemigos, mapaStatus, mapaItems, NULL, NULL);
         break;
     }
     return 0;
